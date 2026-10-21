@@ -25,12 +25,22 @@ export async function GET() {
   }
 
   const responseTimeMs = Date.now() - startTime;
+  const isCloudConverter = Boolean(process.env.CONVERTAPI_SECRET || process.env.CLOUDCONVERT_API_KEY);
+  const converterReady = isCloudConverter || gotenbergStatus;
 
   return NextResponse.json({
     status: dbStatus === "connected" ? "healthy" : "degraded",
     uptimeSeconds: Math.floor(process.uptime()),
     database: dbStatus,
     gotenbergOnline: gotenbergStatus,
+    converterReady,
+    activeEngine: process.env.CONVERTAPI_SECRET
+      ? "ConvertAPI (Cloud MS Office)"
+      : process.env.CLOUDCONVERT_API_KEY
+      ? "CloudConvert (Cloud API)"
+      : gotenbergStatus
+      ? "Gotenberg (LibreOffice Container)"
+      : "None/Local",
     responseTimeMs,
     timestamp: new Date().toISOString(),
   });

@@ -387,17 +387,7 @@ export class GotenbergConverter implements DocumentConverter {
     fileName: string,
     options: ConversionOptions = { losslessCompression: true, reduceImageResolution: false }
   ): Promise<Buffer> {
-    // 1. Prioritize Gotenberg if configured (e.g. Railway or local Docker) and online (Unlimited conversions)
-    const isCustomGotenberg = Boolean(process.env.GOTENBERG_URL && !process.env.GOTENBERG_URL.includes("localhost"));
-    if (isCustomGotenberg && (await this.checkGotenbergOnline())) {
-      try {
-        return await this.convertWithGotenberg(fileBuffer, fileName, options);
-      } catch (err) {
-        console.warn("Gotenberg conversion failed, trying cloud fallback:", err);
-      }
-    }
-
-    // 2. Try ConvertAPI if CONVERTAPI_SECRET is configured
+    // 1. Try ConvertAPI if CONVERTAPI_SECRET is configured (Fast cloud conversion, 100% MS Word layout)
     if (process.env.CONVERTAPI_SECRET) {
       try {
         return await this.convertWithConvertApi(fileBuffer, fileName);
@@ -406,7 +396,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 3. Try CloudConvert if CLOUDCONVERT_API_KEY is configured
+    // 2. Try CloudConvert if CLOUDCONVERT_API_KEY is configured
     if (process.env.CLOUDCONVERT_API_KEY) {
       try {
         return await this.convertWithCloudConvert(fileBuffer, fileName);
@@ -415,7 +405,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 4. Try default/local Gotenberg if online
+    // 3. Try Gotenberg container if online
     if (await this.checkGotenbergOnline()) {
       try {
         return await this.convertWithGotenberg(fileBuffer, fileName, options);
@@ -456,31 +446,7 @@ export class GotenbergConverter implements DocumentConverter {
     fileName: string,
     mode: "precision" | "editable" = "precision"
   ): Promise<Buffer> {
-    // 1. Try Gotenberg if custom URL is configured and online (Unlimited conversions)
-    const isCustomGotenberg = Boolean(process.env.GOTENBERG_URL && !process.env.GOTENBERG_URL.includes("localhost"));
-    if (isCustomGotenberg && (await this.checkGotenbergOnline())) {
-      try {
-        const formData = new FormData();
-        const blob = new Blob([new Uint8Array(pdfBuffer)]);
-        formData.append("files", blob, fileName);
-
-        const endpoint = `${this.getBaseUrl()}/forms/libreoffice/convert`;
-        const response = await fetch(endpoint, {
-          method: "POST",
-          body: formData,
-          signal: AbortSignal.timeout(90000),
-        });
-
-        if (response.ok) {
-          const arrayBuffer = await response.arrayBuffer();
-          return Buffer.from(arrayBuffer);
-        }
-      } catch (e) {
-        console.warn("Gotenberg PDF to DOCX failed, trying cloud fallback:", e);
-      }
-    }
-
-    // 2. Try ConvertAPI if available
+    // 1. Try ConvertAPI if available (Fast cloud conversion)
     if (process.env.CONVERTAPI_SECRET) {
       try {
         const formData = new FormData();
@@ -506,7 +472,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 3. Try default Gotenberg LibreOffice conversion if online
+    // 2. Try Gotenberg LibreOffice conversion if online
     if (await this.checkGotenbergOnline()) {
       try {
         const formData = new FormData();
