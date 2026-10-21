@@ -1,0 +1,17 @@
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: wert-gotenberg
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - LOG_LEVEL=info
+      - API_TIMEOUT=60s
+      - LIBREOFFICE_AUTO_START=true
+    # Production security & sandboxing recommendations:
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2.0'
+    #       memory: 2048M
