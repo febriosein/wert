@@ -58,14 +58,18 @@ export class GotenbergConverter implements DocumentConverter {
     this.baseUrl = (url || process.env.GOTENBERG_URL || "http://localhost:3001").replace(/\/$/, "");
   }
 
+  private getBaseUrl(): string {
+    return (process.env.GOTENBERG_URL || this.baseUrl || "http://localhost:3001").replace(/\/$/, "");
+  }
+
   /**
    * Check if Gotenberg container/service is running
    */
   async checkGotenbergOnline(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.baseUrl}/health`, {
+      const res = await fetch(`${this.getBaseUrl()}/health`, {
         method: "GET",
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(5000),
       });
       return res.ok;
     } catch {
@@ -276,7 +280,7 @@ export class GotenbergConverter implements DocumentConverter {
       formData.append("reduceImageResolution", "false");
     }
 
-    const endpoint = `${this.baseUrl}/forms/libreoffice/convert`;
+    const endpoint = `${this.getBaseUrl()}/forms/libreoffice/convert`;
     const response = await fetch(endpoint, {
       method: "POST",
       body: formData,
@@ -383,7 +387,17 @@ export class GotenbergConverter implements DocumentConverter {
     fileName: string,
     options: ConversionOptions = { losslessCompression: true, reduceImageResolution: false }
   ): Promise<Buffer> {
-    // 1. Try ConvertAPI if CONVERTAPI_SECRET is configured
+    // 1. Prioritize Gotenberg if configured (e.g. Railway or local Docker) and online (Unlimited conversions)
+    const isCustomGotenberg = Boolean(process.env.GOTENBERG_URL && !process.env.GOTENBERG_URL.includes("localhost"));
+    if (isCustomGotenberg && (await this.checkGotenbergOnline())) {
+      try {
+        return await this.convertWithGotenberg(fileBuffer, fileName, options);
+      } catch (err) {
+        console.warn("Gotenberg conversion failed, trying cloud fallback:", err);
+      }
+    }
+
+    // 2. Try ConvertAPI if CONVERTAPI_SECRET is configured
     if (process.env.CONVERTAPI_SECRET) {
       try {
         return await this.convertWithConvertApi(fileBuffer, fileName);
@@ -392,7 +406,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 2. Try CloudConvert if CLOUDCONVERT_API_KEY is configured
+    // 3. Try CloudConvert if CLOUDCONVERT_API_KEY is configured
     if (process.env.CLOUDCONVERT_API_KEY) {
       try {
         return await this.convertWithCloudConvert(fileBuffer, fileName);
@@ -401,7 +415,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 3. Try Gotenberg if online
+    // 4. Try default/local Gotenberg if online
     if (await this.checkGotenbergOnline()) {
       try {
         return await this.convertWithGotenberg(fileBuffer, fileName, options);
@@ -442,7 +456,31 @@ export class GotenbergConverter implements DocumentConverter {
     fileName: string,
     mode: "precision" | "editable" = "precision"
   ): Promise<Buffer> {
-    // 1. Try ConvertAPI if available
+    // 1. Try Gotenberg if custom URL is configured and online (Unlimited conversions)
+    const isCustomGotenberg = Boolean(process.env.GOTENBERG_URL && !process.env.GOTENBERG_URL.includes("localhost"));
+    if (isCustomGotenberg && (await this.checkGotenbergOnline())) {
+      try {
+        const formData = new FormData();
+        const blob = new Blob([new Uint8Array(pdfBuffer)]);
+        formData.append("files", blob, fileName);
+
+        const endpoint = `${this.getBaseUrl()}/forms/libreoffice/convert`;
+        const response = await fetch(endpoint, {
+          method: "POST",
+          body: formData,
+          signal: AbortSignal.timeout(90000),
+        });
+
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          return Buffer.from(arrayBuffer);
+        }
+      } catch (e) {
+        console.warn("Gotenberg PDF to DOCX failed, trying cloud fallback:", e);
+      }
+    }
+
+    // 2. Try ConvertAPI if available
     if (process.env.CONVERTAPI_SECRET) {
       try {
         const formData = new FormData();
@@ -468,14 +506,14 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 2. Try Gotenberg LibreOffice conversion if online
+    // 3. Try default Gotenberg LibreOffice conversion if online
     if (await this.checkGotenbergOnline()) {
       try {
         const formData = new FormData();
         const blob = new Blob([new Uint8Array(pdfBuffer)]);
         formData.append("files", blob, fileName);
 
-        const endpoint = `${this.baseUrl}/forms/libreoffice/convert`;
+        const endpoint = `${this.getBaseUrl()}/forms/libreoffice/convert`;
         const response = await fetch(endpoint, {
           method: "POST",
           body: formData,

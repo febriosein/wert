@@ -17,7 +17,7 @@ export async function GET() {
     const gotenbergUrl = (process.env.GOTENBERG_URL || "http://localhost:3001").replace(/\/$/, "");
     const res = await fetch(`${gotenbergUrl}/health`, {
       method: "GET",
-      signal: AbortSignal.timeout(2000),
+      signal: AbortSignal.timeout(4000),
     });
     gotenbergStatus = res.ok;
   } catch {
