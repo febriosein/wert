@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { documentConverter } from "@/lib/converter/provider";
-import mammoth from "mammoth";
 
 interface RouteProps {
   params: Promise<{ id: string }>;
@@ -50,6 +48,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
 
         if (!downloadError && fileBlob) {
           const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
+          const { documentConverter } = await import("@/lib/converter/provider");
           const pdfBuffer = await documentConverter.convertOfficeToPdf(fileBuffer, file.display_name);
 
           const pdfKey = `${file.user_id}/${file.id}.pdf`;
@@ -162,6 +161,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
 
       const arrayBuffer = await fileBlob.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const mammoth = (await import("mammoth")).default;
       const { value: htmlContent } = await mammoth.convertToHtml({ buffer });
 
       const styledHtml = `<!DOCTYPE html>

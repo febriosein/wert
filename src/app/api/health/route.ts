@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { documentConverter } from "@/lib/converter/provider";
 
 export async function GET() {
   const startTime = Date.now();
@@ -15,7 +14,12 @@ export async function GET() {
   }
 
   try {
-    gotenbergStatus = await documentConverter.checkHealth();
+    const gotenbergUrl = (process.env.GOTENBERG_URL || "http://localhost:3001").replace(/\/$/, "");
+    const res = await fetch(`${gotenbergUrl}/health`, {
+      method: "GET",
+      signal: AbortSignal.timeout(2000),
+    });
+    gotenbergStatus = res.ok;
   } catch {
     gotenbergStatus = false;
   }

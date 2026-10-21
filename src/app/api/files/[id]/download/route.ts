@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { documentConverter } from "@/lib/converter/provider";
 
 interface RouteProps {
   params: Promise<{ id: string }>;
@@ -56,6 +55,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
             }
 
             const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
+            const { documentConverter } = await import("@/lib/converter/provider");
             const pdfBuffer = await documentConverter.convertOfficeToPdf(fileBuffer, file.display_name);
 
             const pdfKey = `${file.user_id}/${file.id}.pdf`;
@@ -106,6 +106,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
             }
 
             const pdfBuffer = Buffer.from(await fileBlob.arrayBuffer());
+            const { documentConverter } = await import("@/lib/converter/provider");
             const docxBuffer = await documentConverter.convertPdfToDocx(pdfBuffer, file.display_name, "precision");
 
             const docxKey = `${file.user_id}/${file.id}.docx`;

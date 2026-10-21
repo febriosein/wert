@@ -5,11 +5,9 @@
  * Tier 1: Gotenberg (Docker/Cloud) with lossless image compression & print resolution
  * Tier 2: Microsoft Word COM Automation (Windows) - 100% pixel-perfect layout & original DPI
  * Tier 3: LibreOffice CLI (Headless)
- * Fallback: Node-based DOCX generator for PDF -> Word
+ * Fallback: Node-based DOCX generator for PDF -> Word (Dynamic import to protect serverless runtimes)
  */
 
-import { Document, Paragraph, TextRun, Packer, HeadingLevel } from "docx";
-import { PDFParse } from "pdf-parse";
 import { execFile } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
@@ -70,7 +68,6 @@ export class GotenbergConverter implements DocumentConverter {
         return false;
       }
 
-      // Check if WINWORD.EXE or Word COM registration exists
       const officePaths = [
         "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
         "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
@@ -83,7 +80,6 @@ export class GotenbergConverter implements DocumentConverter {
         return true;
       }
 
-      // Quick COM test
       const { stdout } = await execFileAsync(
         "powershell.exe",
         [
@@ -104,7 +100,7 @@ export class GotenbergConverter implements DocumentConverter {
   }
 
   /**
-   * Check if LibreOffice CLI (soffice) is available locally
+   * Check if LibreOffice CLI (soffice) is available locally (Zero subprocess spawn)
    */
   async isLibreOfficeCliAvailable(): Promise<boolean> {
     if (cachedLibreOfficeCliAvailable !== null) return cachedLibreOfficeCliAvailable;
@@ -115,12 +111,11 @@ export class GotenbergConverter implements DocumentConverter {
           "C:\\Program Files\\LibreOffice\\program\\soffice.exe",
           "C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe",
         ];
-        const found = loPaths.some((p) => fsSync.existsSync(p));
-        cachedLibreOfficeCliAvailable = found;
-        return found;
+        cachedLibreOfficeCliAvailable = loPaths.some((p) => fsSync.existsSync(p));
+        return cachedLibreOfficeCliAvailable;
       } else {
-        const { stdout } = await execFileAsync("which", ["soffice"]).catch(() => ({ stdout: "" }));
-        cachedLibreOfficeCliAvailable = !!stdout.trim();
+        const commonPaths = ["/usr/bin/soffice", "/usr/bin/libreoffice", "/usr/local/bin/soffice"];
+        cachedLibreOfficeCliAvailable = commonPaths.some((p) => fsSync.existsSync(p));
         return cachedLibreOfficeCliAvailable;
       }
     } catch {
@@ -329,20 +324,27 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 2. High-fidelity Node Fallback Parser
+    // 2. High-fidelity Node Fallback Parser (Dynamically loaded to protect serverless boots)
     let text = "";
     try {
-      const parser = new PDFParse({ data: new Uint8Array(pdfBuffer) });
-      const parsed = await parser.getText();
-      text = (parsed && (parsed as any).text) || "";
+      const pdfModule = await import("pdf-parse");
+      const PDFParseClass = (pdfModule as any).PDFParse || (pdfModule as any).default || pdfModule;
+      if (typeof PDFParseClass === "function") {
+        const parser = new PDFParseClass({ data: new Uint8Array(pdfBuffer) });
+        if (parser.getText) {
+          const parsed = await parser.getText();
+          text = (parsed && (parsed as any).text) || "";
+        }
+      }
     } catch (parseErr: any) {
       console.warn("PDF parser note:", parseErr?.message || parseErr);
       text = `Dokumen: ${fileName}\n\n(Catatan: Dokumen ini dikonversi dari PDF. Untuk PDF hasil scan, teks asli disarankan diedit langsung di Word).`;
     }
 
     try {
+      const { Document, Paragraph, TextRun, Packer, HeadingLevel } = await import("docx");
       const lines = text.split("\n").map((l: string) => l.trim()).filter(Boolean);
-      const paragraphs: Paragraph[] = [];
+      const paragraphs: any[] = [];
 
       // Document title
       const title = fileName.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
