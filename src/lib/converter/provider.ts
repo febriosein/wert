@@ -2,10 +2,11 @@
  * DocumentConverterProvider Interface & Multi-Tier Implementation
  * Supports DOCX/PPTX/XLSX -> PDF and PDF -> DOCX (Precision & Editable modes)
  *
- * Tier 1: Gotenberg (Docker/Cloud) with lossless image compression & print resolution
- * Tier 2: Microsoft Word COM Automation (Windows) - 100% pixel-perfect layout & original DPI
- * Tier 3: LibreOffice CLI (Headless)
- * Fallback: Node-based DOCX generator for PDF -> Word (Dynamic import to protect serverless runtimes)
+ * Tier 1: ConvertAPI (Cloud Serverless - Zero Container required, 100% Word fidelity)
+ * Tier 2: CloudConvert API (Cloud Serverless Alternative)
+ * Tier 3: Gotenberg (Docker Container / Cloud VPS) with lossless image compression
+ * Tier 4: Microsoft Word COM Automation (Windows localhost)
+ * Tier 5: LibreOffice CLI (Headless Local)
  */
 
 import { execFile } from "child_process";
@@ -27,6 +28,24 @@ export interface DocumentConverter {
   convertOfficeToPdf(fileBuffer: Buffer, fileName: string, options?: ConversionOptions): Promise<Buffer>;
   convertPdfToDocx(pdfBuffer: Buffer, fileName: string, mode?: "precision" | "editable"): Promise<Buffer>;
   checkHealth(): Promise<boolean>;
+}
+
+async function extractConvertApiResult(res: Response): Promise<Buffer> {
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const json = await res.json();
+    const firstFile = json?.Files?.[0];
+    if (firstFile?.FileData) {
+      return Buffer.from(firstFile.FileData, "base64");
+    }
+    if (firstFile?.Url) {
+      const downloadRes = await fetch(firstFile.Url);
+      if (!downloadRes.ok) throw new Error("Gagal mengunduh file dari URL ConvertAPI.");
+      return Buffer.from(await downloadRes.arrayBuffer());
+    }
+    throw new Error("Respon ConvertAPI tidak memuat data file.");
+  }
+  return Buffer.from(await res.arrayBuffer());
 }
 
 let cachedWordComAvailable: boolean | null = null;
@@ -100,7 +119,7 @@ export class GotenbergConverter implements DocumentConverter {
   }
 
   /**
-   * Check if LibreOffice CLI (soffice) is available locally (Zero subprocess spawn)
+   * Check if LibreOffice CLI (soffice) is available locally
    */
   async isLibreOfficeCliAvailable(): Promise<boolean> {
     if (cachedLibreOfficeCliAvailable !== null) return cachedLibreOfficeCliAvailable;
@@ -125,13 +144,117 @@ export class GotenbergConverter implements DocumentConverter {
   }
 
   /**
-   * Health check passes if Gotenberg, Microsoft Word COM, or LibreOffice CLI is available
+   * Health check passes if ConvertAPI, CloudConvert, Gotenberg, MS Word, or LibreOffice is configured
    */
   async checkHealth(): Promise<boolean> {
+    if (process.env.CONVERTAPI_SECRET) return true;
+    if (process.env.CLOUDCONVERT_API_KEY) return true;
     if (await this.checkGotenbergOnline()) return true;
     if (await this.isWordComAvailable()) return true;
     if (await this.isLibreOfficeCliAvailable()) return true;
     return false;
+  }
+
+  /**
+   * Convert DOCX/PPTX/XLSX to PDF via ConvertAPI (Zero-container cloud API)
+   * Free tier available: 250 free conversions at https://www.convertapi.com/
+   */
+  private async convertWithConvertApi(fileBuffer: Buffer, fileName: string): Promise<Buffer> {
+    const secret = process.env.CONVERTAPI_SECRET;
+    if (!secret) throw new Error("CONVERTAPI_SECRET belum dikonfigurasi.");
+
+    const ext = (path.extname(fileName) || ".docx").replace(/^\./, "").toLowerCase();
+    const formData = new FormData();
+    const blob = new Blob([new Uint8Array(fileBuffer)]);
+    formData.append("File", blob, fileName);
+    formData.append("StoreFile", "false");
+
+    const endpoint = `https://v2.convertapi.com/convert/${ext}/to/pdf`;
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        Accept: "application/octet-stream",
+      },
+      body: formData,
+      signal: AbortSignal.timeout(60000),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`ConvertAPI error (${res.status}): ${errText}`);
+    }
+
+    return await extractConvertApiResult(res);
+  }
+
+  /**
+   * Convert DOCX/Office to PDF via CloudConvert API
+   */
+  private async convertWithCloudConvert(fileBuffer: Buffer, fileName: string): Promise<Buffer> {
+    const apiKey = process.env.CLOUDCONVERT_API_KEY;
+    if (!apiKey) throw new Error("CLOUDCONVERT_API_KEY belum dikonfigurasi.");
+
+    // 1. Create Job
+    const jobRes = await fetch("https://api.cloudconvert.com/v2/jobs", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tasks: {
+          "import-my-file": {
+            operation: "import/upload",
+          },
+          "convert-my-file": {
+            operation: "convert",
+            input: "import-my-file",
+            output_format: "pdf",
+          },
+          "export-my-file": {
+            operation: "export/url",
+            input: "convert-my-file",
+          },
+        },
+      }),
+    });
+
+    const jobData = await jobRes.json();
+    const uploadTask = jobData?.data?.tasks?.find((t: any) => t.name === "import-my-file");
+    if (!uploadTask?.result?.form) throw new Error("Gagal menginisialisasi CloudConvert task.");
+
+    // 2. Upload file to CloudConvert
+    const uploadUrl = uploadTask.result.form.url;
+    const uploadFormData = new FormData();
+    for (const [k, v] of Object.entries(uploadTask.result.form.parameters || {})) {
+      uploadFormData.append(k, v as string);
+    }
+    uploadFormData.append("file", new Blob([new Uint8Array(fileBuffer)]), fileName);
+
+    await fetch(uploadUrl, { method: "POST", body: uploadFormData });
+
+    // 3. Poll for job completion
+    const jobId = jobData.data.id;
+    let exportUrl = "";
+    for (let i = 0; i < 30; i++) {
+      await new Promise((r) => setTimeout(r, 1000));
+      const statusRes = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobId}`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      const currentJob = await statusRes.json();
+      if (currentJob.data.status === "finished") {
+        const exportTask = currentJob.data.tasks.find((t: any) => t.name === "export-my-file");
+        exportUrl = exportTask?.result?.files?.[0]?.url;
+        break;
+      }
+      if (currentJob.data.status === "error") throw new Error("CloudConvert conversion failed.");
+    }
+
+    if (!exportUrl) throw new Error("Timeout menunggu hasil konversi CloudConvert.");
+
+    const pdfRes = await fetch(exportUrl);
+    return Buffer.from(await pdfRes.arrayBuffer());
   }
 
   /**
@@ -249,16 +372,36 @@ export class GotenbergConverter implements DocumentConverter {
 
   /**
    * Convert DOCX, PPTX, XLSX to PDF with Multi-Tier Fallback:
-   * 1. Gotenberg (Docker/Cloud)
-   * 2. Microsoft Word COM (Windows - 100% identical layout & print resolution)
-   * 3. LibreOffice Headless CLI
+   * 1. ConvertAPI (Direct Cloud API - 100% exact MS Word layout, no container needed)
+   * 2. CloudConvert API (Direct Cloud API)
+   * 3. Gotenberg Container (Docker/Cloud VPS)
+   * 4. Microsoft Word COM (Windows Localhost)
+   * 5. LibreOffice Headless CLI
    */
   async convertOfficeToPdf(
     fileBuffer: Buffer,
     fileName: string,
     options: ConversionOptions = { losslessCompression: true, reduceImageResolution: false }
   ): Promise<Buffer> {
-    // 1. If Gotenberg is online, use it
+    // 1. Try ConvertAPI if CONVERTAPI_SECRET is configured
+    if (process.env.CONVERTAPI_SECRET) {
+      try {
+        return await this.convertWithConvertApi(fileBuffer, fileName);
+      } catch (err: any) {
+        console.warn("ConvertAPI failed, trying fallback:", err?.message || err);
+      }
+    }
+
+    // 2. Try CloudConvert if CLOUDCONVERT_API_KEY is configured
+    if (process.env.CLOUDCONVERT_API_KEY) {
+      try {
+        return await this.convertWithCloudConvert(fileBuffer, fileName);
+      } catch (err: any) {
+        console.warn("CloudConvert failed, trying fallback:", err?.message || err);
+      }
+    }
+
+    // 3. Try Gotenberg if online
     if (await this.checkGotenbergOnline()) {
       try {
         return await this.convertWithGotenberg(fileBuffer, fileName, options);
@@ -267,7 +410,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 2. If on Windows and Word COM is available, use Microsoft Word (Pixel-perfect layout, no image compression)
+    // 4. Try Microsoft Word COM on Windows (Pixel-perfect layout, no image compression)
     if (process.platform === "win32" && (await this.isWordComAvailable())) {
       try {
         return await this.convertWithWordCom(fileBuffer, fileName);
@@ -276,7 +419,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 3. If LibreOffice CLI is available locally
+    // 5. Try LibreOffice CLI if available locally
     if (await this.isLibreOfficeCliAvailable()) {
       try {
         return await this.convertWithLibreOfficeCli(fileBuffer, fileName);
@@ -286,7 +429,7 @@ export class GotenbergConverter implements DocumentConverter {
     }
 
     throw new Error(
-      "Layanan konversi dokumen belum tersedia. Pastikan Gotenberg, Microsoft Word, atau LibreOffice terpasang pada server."
+      "Layanan konversi dokumen belum siap. Di lingkungan Vercel, tambahkan CONVERTAPI_SECRET di Environment Variables (dapatkan gratis di convertapi.com) atau pasang GOTENBERG_URL."
     );
   }
 
@@ -299,10 +442,34 @@ export class GotenbergConverter implements DocumentConverter {
     fileName: string,
     mode: "precision" | "editable" = "precision"
   ): Promise<Buffer> {
-    const isOnline = await this.checkGotenbergOnline();
+    // 1. Try ConvertAPI if available
+    if (process.env.CONVERTAPI_SECRET) {
+      try {
+        const formData = new FormData();
+        const blob = new Blob([new Uint8Array(pdfBuffer)]);
+        formData.append("File", blob, fileName);
+        formData.append("StoreFile", "false");
 
-    // 1. Try Gotenberg LibreOffice conversion if online
-    if (isOnline) {
+        const res = await fetch("https://v2.convertapi.com/convert/pdf/to/docx", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.CONVERTAPI_SECRET}`,
+            Accept: "application/octet-stream",
+          },
+          body: formData,
+          signal: AbortSignal.timeout(60000),
+        });
+
+        if (res.ok) {
+          return await extractConvertApiResult(res);
+        }
+      } catch (err) {
+        console.warn("ConvertAPI PDF to DOCX failed, trying fallback:", err);
+      }
+    }
+
+    // 2. Try Gotenberg LibreOffice conversion if online
+    if (await this.checkGotenbergOnline()) {
       try {
         const formData = new FormData();
         const blob = new Blob([new Uint8Array(pdfBuffer)]);
@@ -324,7 +491,7 @@ export class GotenbergConverter implements DocumentConverter {
       }
     }
 
-    // 2. High-fidelity Node Fallback Parser (Dynamically loaded to protect serverless boots)
+    // 3. High-fidelity Node Fallback Parser
     let text = "";
     try {
       const pdfModule = await import("pdf-parse");

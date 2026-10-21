@@ -19,6 +19,7 @@ import {
   FileDown,
   Loader2,
   Check,
+  AlertCircle,
 } from "lucide-react";
 import { formatBytes, formatCountdown } from "@/lib/utils";
 import { Dropzone } from "./Dropzone";
@@ -51,6 +52,10 @@ export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps
   const [showDocxModal, setShowDocxModal] = useState(false);
   const [docxMode, setDocxMode] = useState<"precision" | "editable">("precision");
   const [convertingDocx, setConvertingDocx] = useState(false);
+
+  // Office to PDF download & conversion state
+  const [convertingPdf, setConvertingPdf] = useState(false);
+  const [conversionError, setConversionError] = useState<string | null>(null);
 
   const countdown = formatCountdown(file.expires_at);
 
@@ -127,6 +132,41 @@ export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps
       alert(err.message || "Gagal mengonversi");
     } finally {
       setConvertingDocx(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    setConvertingPdf(true);
+    setConversionError(null);
+    try {
+      const res = await fetch(`/api/files/${file.id}/download?variant=pdf`);
+      if (!res.ok) {
+        let msg = "Gagal memproses konversi ke PDF.";
+        try {
+          const errData = await res.json();
+          if (errData?.error) msg = errData.error;
+        } catch {
+          // keep default message
+        }
+        throw new Error(msg);
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const baseName = file.display_name.replace(/\.[^/.]+$/, "");
+      a.download = `${baseName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      onRefresh();
+    } catch (err: any) {
+      setConversionError(err.message || "Gagal memproses konversi ke PDF.");
+    } finally {
+      setConvertingPdf(false);
     }
   };
 
@@ -275,14 +315,25 @@ export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps
           </a>
 
           {isConvertibleToPdf && (
-            <a
-              href={`/api/files/${file.id}/download?variant=pdf`}
-              className="inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition"
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={convertingPdf}
+              className="inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition disabled:opacity-50"
               title="Download versi PDF hasil konversi"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>PDF</span>
-            </a>
+              {convertingPdf ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PDF</span>
+                </>
+              )}
+            </button>
           )}
 
           {isPdf && (
@@ -428,6 +479,58 @@ export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps
                 className="py-2.5 px-4 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition"
               >
                 Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Conversion Error Modal */}
+      {conversionError && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl flex flex-col gap-4">
+            <button
+              type="button"
+              onClick={() => setConversionError(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Gagal Mengonversi ke PDF</h3>
+                <p className="text-xs text-slate-500">Terjadi kendala saat memproses dokumen</p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-800 leading-relaxed">
+              {conversionError}
+            </div>
+
+            {conversionError.includes("CONVERTAPI_SECRET") || conversionError.includes("Layanan konversi") ? (
+              <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-normal">
+                💡 <b>Solusi Admin Vercel:</b> Pastikan Environment Variable <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-800">CONVERTAPI_SECRET</code> telah diisi di pengaturan proyek Vercel (dapatkan kunci gratis di <a href="https://www.convertapi.com" target="_blank" rel="noreferrer" className="text-blue-600 underline">convertapi.com</a>).
+              </p>
+            ) : null}
+
+            <div className="flex items-center gap-2 pt-2">
+              <a
+                href={`/api/files/${file.id}/download?variant=original`}
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white shadow transition flex items-center justify-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Unduh File Asli (.docx)</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setConversionError(null)}
+                className="py-2.5 px-4 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition"
+              >
+                Tutup
               </button>
             </div>
           </div>
