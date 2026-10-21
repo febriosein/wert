@@ -54,6 +54,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
 
   const isZip = file?.ext.toLowerCase() === "zip";
   const isImage = file ? ["jpg", "jpeg", "png", "heic", "webp"].includes(file.ext.toLowerCase()) : false;
+  const isOffice = file ? ["docx", "doc", "pptx", "xlsx"].includes(file.ext.toLowerCase()) : false;
 
   const downloadUrl = file ? `/api/files/${file.id}/download?variant=original` : "";
   const previewUrl = file ? `/api/files/${file.id}/preview` : "";
@@ -279,7 +280,11 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               {!iframeLoaded && !iframeError && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-50 rounded-2xl z-10 text-slate-400">
                   <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                  <span className="text-xs font-medium">Menyiapkan pratinjau dokumen...</span>
+                  <span className="text-xs font-medium">
+                    {isOffice && !file?.pdf_key
+                      ? "Mengonversi dokumen Word ke PDF presisi tinggi..."
+                      : "Menyiapkan pratinjau dokumen..."}
+                  </span>
                 </div>
               )}
 

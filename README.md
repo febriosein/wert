@@ -108,7 +108,14 @@ PIN_PEPPER=your_random_secret_pepper_for_argon2
 SESSION_SECRET=your_random_32_char_session_secret
 CRON_SECRET=your_random_cron_secret
 
-# Konversi Dokumen (Gotenberg Docker jika digunakan)
+# Konversi Dokumen Presisi Tinggi (Multi-Tier)
+# Tier 1: ConvertAPI (Sangat disarankan untuk deploy Vercel - Gratis 250 konversi di https://www.convertapi.com/)
+CONVERTAPI_SECRET=your_convertapi_secret_here
+
+# Tier 2: CloudConvert API (Alternatif)
+# CLOUDCONVERT_API_KEY=your_cloudconvert_api_key_here
+
+# Tier 3: Gotenberg Docker (Jika menjalankan container mandiri)
 GOTENBERG_URL=http://localhost:3001
 ```
 
@@ -122,7 +129,8 @@ Pastikan dua bucket penyimpanan dibuat di **Supabase Storage**:
 - `derived` (Private)
 
 ### 5. Jalankan Layanan Konversi (Pilih salah satu)
-- **Di Windows dengan Microsoft Office**: Layanan otomatis menggunakan Microsoft Word asli melalui skrip PowerShell bawaan di `scripts/convert_word.ps1`.
+- **Di Cloud (Vercel)**: Daftarkan akun gratis di [ConvertAPI](https://www.convertapi.com/), lalu masukkan Secret Key ke Environment Variable `CONVERTAPI_SECRET` di Vercel. Tidak perlu setup server/container terpisah!
+- **Di Windows Lokal dengan Microsoft Office**: Sistem otomatis mendeteksi dan menggunakan Microsoft Word asli melalui skrip PowerShell bawaan di `scripts/convert_word.ps1`.
 - **Menggunakan Docker (Gotenberg)**:
   ```bash
   docker compose up -d
