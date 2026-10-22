@@ -14,8 +14,6 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
     }
 
     const { id } = await params;
-    const { searchParams } = new URL(req.url);
-    const variant = searchParams.get("variant") || "original"; // 'original' | 'pdf' | 'docx'
 
     const { data: file, error } = await supabaseAdmin
       .from("files")
@@ -33,108 +31,9 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
       return NextResponse.json({ error: "File telah kedaluwarsa dan tidak dapat diakses." }, { status: 410 });
     }
 
-    let targetBucket = "uploads";
-    let targetKey = file.storage_key;
-    let downloadFilename = file.display_name;
-
-    if (variant === "pdf") {
-      if (file.ext === "pdf") {
-        targetBucket = "uploads";
-        targetKey = file.storage_key;
-        downloadFilename = file.display_name;
-      } else {
-        // Just-in-time conversion if not yet converted
-        if (!file.pdf_key) {
-          try {
-            const { data: fileBlob, error: downloadError } = await supabaseAdmin.storage
-              .from("uploads")
-              .download(file.storage_key);
-
-            if (downloadError || !fileBlob) {
-              return NextResponse.json({ error: "Gagal mengunduh file asli dari penyimpanan." }, { status: 500 });
-            }
-
-            const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
-            const { documentConverter } = await import("@/lib/converter/provider");
-            const pdfBuffer = await documentConverter.convertOfficeToPdf(fileBuffer, file.display_name);
-
-            const pdfKey = `${file.user_id}/${file.id}.pdf`;
-            const { error: uploadError } = await supabaseAdmin.storage
-              .from("derived")
-              .upload(pdfKey, pdfBuffer, {
-                contentType: "application/pdf",
-                upsert: true,
-              });
-
-            if (uploadError) {
-              return NextResponse.json({ error: "Gagal menyimpan PDF hasil konversi." }, { status: 500 });
-            }
-
-            await supabaseAdmin
-              .from("files")
-              .update({
-                pdf_key: pdfKey,
-                status: "ready",
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", id);
-
-            file.pdf_key = pdfKey;
-          } catch (convErr: any) {
-            console.error("On-demand download conversion error:", convErr);
-            return NextResponse.json({
-              error: `Gagal memproses konversi ke PDF: ${convErr.message || convErr}`,
-            }, { status: 500 });
-          }
-        }
-
-        targetBucket = "derived";
-        targetKey = file.pdf_key;
-        const nameWithoutExt = file.display_name.replace(/\.[^/.]+$/, "");
-        downloadFilename = `${nameWithoutExt}.pdf`;
-      }
-    } else if (variant === "docx") {
-      if (!file.docx_key) {
-        if (file.ext === "pdf") {
-          try {
-            const { data: fileBlob, error: downloadError } = await supabaseAdmin.storage
-              .from("uploads")
-              .download(file.storage_key);
-
-            if (downloadError || !fileBlob) {
-              return NextResponse.json({ error: "Gagal mengunduh file PDF asli." }, { status: 500 });
-            }
-
-            const pdfBuffer = Buffer.from(await fileBlob.arrayBuffer());
-            const { documentConverter } = await import("@/lib/converter/provider");
-            const docxBuffer = await documentConverter.convertPdfToDocx(pdfBuffer, file.display_name, "precision");
-
-            const docxKey = `${file.user_id}/${file.id}.docx`;
-            await supabaseAdmin.storage.from("derived").upload(docxKey, docxBuffer, {
-              contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-              upsert: true,
-            });
-
-            await supabaseAdmin
-              .from("files")
-              .update({ docx_key: docxKey, updated_at: new Date().toISOString() })
-              .eq("id", id);
-
-            file.docx_key = docxKey;
-          } catch (convErr: any) {
-            return NextResponse.json({
-              error: `Gagal memproses konversi ke Word: ${convErr.message || convErr}`,
-            }, { status: 500 });
-          }
-        } else {
-          return NextResponse.json({ error: "Versi Word belum selesai diproses." }, { status: 400 });
-        }
-      }
-      targetBucket = "derived";
-      targetKey = file.docx_key;
-      const nameWithoutExt = file.display_name.replace(/\.[^/.]+$/, "");
-      downloadFilename = `${nameWithoutExt}.docx`;
-    }
+    const targetBucket = "uploads";
+    const targetKey = file.storage_key;
+    const downloadFilename = file.display_name;
 
     // Generate signed download URL (60 seconds expiry)
     const { data: signedData, error: signError } = await supabaseAdmin.storage

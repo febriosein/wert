@@ -48,9 +48,9 @@ export default function PrivacyPage() {
               Secara default, seluruh file yang Anda unggah akan <b>terhapus secara permanen setelah 48 jam</b>. Anda dapat mematikan fitur ini atau memperpanjang timer melalui tombol pengaturan file. Ketika file dihapus, file asli beserta turunan PDF pratinjaunya langsung dihapus dari media penyimpanan.
             </p>
 
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">3. Pemrosesan & Konversi Dokumen</h3>
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">3. Pemrosesan & Penyimpanan Dokumen</h3>
             <p>
-              File dokumen (seperti DOCX, PPTX, XLSX) diproses dalam container konversi terisolasi (sandboxed) tanpa akses jaringan internet luar. File Anda <b>tidak pernah dijual, tidak pernah dianalisis untuk profil iklan, dan tidak pernah digunakan untuk pelatihan kecerdasan buatan (AI)</b>.
+              File dokumen yang Anda unggah disimpan dengan aman di penyimpanan terisolasi. File Anda <b>tidak pernah dijual, tidak pernah dianalisis untuk profil iklan, dan tidak pernah digunakan untuk pelatihan kecerdasan buatan (AI)</b>.
             </p>
 
             <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">4. Kepatuhan Hukum</h3>

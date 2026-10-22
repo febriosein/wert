@@ -98,9 +98,6 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
       : null;
 
-    const needsConversion = ["docx", "pptx", "xlsx"].includes(ext);
-    const newStatus = needsConversion ? "processing" : "ready";
-
     // Atomically update DB record
     const { data: updatedFile, error: updateError } = await supabaseAdmin
       .from("files")
@@ -111,7 +108,7 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
         size_bytes: replacementFile.size,
         storage_key: newStorageKey,
         kind,
-        status: newStatus,
+        status: "ready",
         pdf_key: null,
         docx_key: null,
         preview_key: null,
@@ -125,21 +122,6 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
-    }
-
-    // Trigger conversion for replacement file if needed
-    if (needsConversion) {
-      await supabaseAdmin.from("conversion_jobs").insert({
-        file_id: id,
-        type: `${ext}_to_pdf` as any,
-        status: "queued",
-      });
-
-      const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-      const protocol = req.headers.get("x-forwarded-proto") || "http";
-      fetch(`${protocol}://${host}/api/files/${id}/convert`, {
-        method: "POST",
-      }).catch((e) => console.error("Async conversion error:", e));
     }
 
     return NextResponse.json({ success: true, file: updatedFile });

@@ -110,21 +110,10 @@ async function runPilotSimulation() {
     const mobileUploadData = await mobileUploadRes.json();
     assert(mobileUploadRes.ok && mobileUploadData.success, "Mobile uploads file directly without login");
 
-    // 5. FLOW D: CONVERSION & DOWNLOAD
-    console.log("\n[5] Flow D: PDF to Word Conversion & Download Variant:");
-    const convertRes = await fetch(`${BASE_URL}/api/files/${fileIdA}/convert`, {
-      method: "POST",
-      headers: {
-        Cookie: sessionCookieA,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ type: "pdf_to_docx", mode: "precision" }),
-    });
-    const convertData = await convertRes.json();
-    assert(convertRes.ok && convertData.success, "PDF to DOCX conversion completes");
-
+    // 5. FLOW D: DIRECT SECURE DOWNLOAD
+    console.log("\n[5] Flow D: Direct File Download & Range Streaming:");
     const downloadOriginalRes = await fetch(
-      `${BASE_URL}/api/files/${fileIdA}/download?variant=original`,
+      `${BASE_URL}/api/files/${fileIdA}/download`,
       {
         headers: { Cookie: sessionCookieA },
         redirect: "manual",
@@ -132,7 +121,7 @@ async function runPilotSimulation() {
     );
     assert(
       downloadOriginalRes.status === 200 || downloadOriginalRes.status === 307 || downloadOriginalRes.status === 302,
-      "Signed download for original file is served"
+      "Signed download for uploaded file is served"
     );
 
     // 6. FLOW E: ATOMIC FILE REPLACE

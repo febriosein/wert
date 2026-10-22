@@ -34,20 +34,13 @@ Setiap hari, ribuan mahasiswa dan pelajar mencetak tugas di tempat fotokopi/rent
 - **Direct-to-Storage Upload**: File diunggah langsung ke Supabase Storage via signed URL untuk kecepatan transfer maksimal.
 - **Validasi Magic Bytes**: Verifikasi tipe file sebenarnya di sisi client dan server untuk mencegah file berbahaya yang menyamar.
 
-### 3. 🎯 Konversi Dokumen Presisi Tinggi (Word ↔ PDF)
-- **Konversi DOCX ke PDF 100% Identik**: Menggunakan engine konversi *multi-tier* (Microsoft Word COM Automation di Windows / Gotenberg LibreOffice di Docker/Cloud).
-  - Posisi teks, font, tabel, margin, header/footer, dan nomor halaman **tidak bergeser sama sekali**.
-  - Foto dan gambar di dalam dokumen dipertahankan dalam resolusi penuh (*lossless print quality*).
-- **Konversi PDF ke Word (DOCX)**: Mendukung *Mode Presisi* dan *Mode Editable*.
-- **Just-In-Time (JIT) Conversion**: Konversi otomatis terjadi saat pratinjau atau saat tombol download PDF ditekan.
-
-### 4. 👁️ Pratinjau & Cetak Dokumen Cepat
-- **Universal In-Browser Viewer**: Pratinjau langsung file PDF, Word (DOCX), dan gambar (JPG, PNG, WebP) tanpa aplikasi pihak ketiga.
+### 3. 👁️ Pratinjau & Cetak Dokumen Cepat
+- **Universal In-Browser Viewer**: Pratinjau langsung file PDF dan gambar (JPG, PNG, WebP) tanpa aplikasi pihak ketiga.
 - **Safe ZIP Archive Inspection**: Membaca daftar isi file ZIP secara aman tanpa mengekstrak (*zero-extraction* via Central Directory parser).
 - **Cetak 1-Klik**: Tombol "Cetak Dokumen" langsung memicu dialog cetak printer komputer rental.
 - **Pengingat Keluar Komputer Umum**: Menampilkan modal pengingat untuk logout otomatis setelah perintah cetak selesai.
 
-### 5. 🔒 Keamanan Khusus Komputer Rental/Umum
+### 4. 🔒 Keamanan Khusus Komputer Rental/Umum
 - **Anti-Cache Header**: Semua rute dokumen menggunakan `Cache-Control: private, no-cache, no-store, must-revalidate` agar browser rental tidak menyimpan file di disk/cache.
 - **Perlindungan IDOR**: Autentikasi ketat memastikan pengguna lain tidak dapat mengakses, melihat, mengunduh, mengganti, atau menghapus file Anda.
 - **Auto-Delete Timer**: File otomatis terhapus setelah 48 jam (dapat disesuaikan atau dinonaktifkan di pengaturan).
@@ -64,7 +57,6 @@ Setiap hari, ribuan mahasiswa dan pelajar mencetak tugas di tempat fotokopi/rent
 | **Autentikasi & Keamanan** | `@node-rs/argon2`, HttpOnly Cookie, SHA-256 session token |
 | **Database & Storage** | [Supabase](https://supabase.com/) (PostgreSQL & Object Storage) |
 | **Sinkronisasi Realtime** | Supabase Realtime WebSocket |
-| **Engine Dokumen** | Microsoft Word COM Automation / [Gotenberg 8](https://gotenberg.dev/) (LibreOffice), `docx`, `pdf-parse`, `mammoth` |
 | **QR Code** | `qrcode` |
 | **Pengujian** | Golden Test Suite & Photocopy Pilot Simulation Suite (Node.js) |
 
@@ -107,36 +99,17 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 PIN_PEPPER=your_random_secret_pepper_for_argon2
 SESSION_SECRET=your_random_32_char_session_secret
 CRON_SECRET=your_random_cron_secret
-
-# Konversi Dokumen Presisi Tinggi (Multi-Tier)
-# Tier 1: ConvertAPI (Sangat disarankan untuk deploy Vercel - Gratis 250 konversi di https://www.convertapi.com/)
-CONVERTAPI_SECRET=your_convertapi_secret_here
-
-# Tier 2: CloudConvert API (Alternatif)
-# CLOUDCONVERT_API_KEY=your_cloudconvert_api_key_here
-
-# Tier 3: Gotenberg Docker (Jika menjalankan container mandiri)
-GOTENBERG_URL=http://localhost:3001
 ```
 
 ### 4. Setup Database & Storage Supabase
 Jalankan file SQL migrasi di Supabase SQL Editor:
-1. `supabase/migrations/00001_initial_schema.sql` (Tabel `users`, `sessions`, `files`, `upload_sessions`, `conversion_jobs`, dll.)
+1. `supabase/migrations/00001_initial_schema.sql` (Tabel `users`, `sessions`, `files`, `upload_sessions`, dll.)
 2. `supabase/migrations/00002_fix_username_regex.sql` (Perbaikan regex username)
 
-Pastikan dua bucket penyimpanan dibuat di **Supabase Storage**:
+Pastikan bucket penyimpanan dibuat di **Supabase Storage**:
 - `uploads` (Private)
-- `derived` (Private)
 
-### 5. Jalankan Layanan Konversi (Pilih salah satu)
-- **Di Cloud (Vercel)**: Daftarkan akun gratis di [ConvertAPI](https://www.convertapi.com/), lalu masukkan Secret Key ke Environment Variable `CONVERTAPI_SECRET` di Vercel. Tidak perlu setup server/container terpisah!
-- **Di Windows Lokal dengan Microsoft Office**: Sistem otomatis mendeteksi dan menggunakan Microsoft Word asli melalui skrip PowerShell bawaan di `scripts/convert_word.ps1`.
-- **Menggunakan Docker (Gotenberg)**:
-  ```bash
-  docker compose up -d
-  ```
-
-### 6. Jalankan Server Development
+### 5. Jalankan Server Development
 ```bash
 npm run dev
 ```

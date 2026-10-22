@@ -44,9 +44,6 @@ export async function POST(req: NextRequest) {
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
       : null;
 
-    const needsConversion = ["docx", "pptx", "xlsx"].includes(ext);
-    const initialStatus = needsConversion ? "processing" : "ready";
-
     // Insert file record
     const { data: newFile, error: insertError } = await supabaseAdmin
       .from("files")
@@ -59,7 +56,7 @@ export async function POST(req: NextRequest) {
         size_bytes: size || 0,
         storage_key: storageKey,
         kind,
-        status: initialStatus,
+        status: "ready",
         expires_at: expiresAt,
       })
       .select("*")
@@ -67,21 +64,6 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
-    }
-
-    // Trigger async conversion if needed
-    if (needsConversion) {
-      await supabaseAdmin.from("conversion_jobs").insert({
-        file_id: fileId,
-        type: `${ext}_to_pdf` as any,
-        status: "queued",
-      });
-
-      const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-      const protocol = req.headers.get("x-forwarded-proto") || "http";
-      fetch(`${protocol}://${host}/api/files/${fileId}/convert`, {
-        method: "POST",
-      }).catch((e) => console.error("Async conversion trigger error:", e));
     }
 
     return NextResponse.json({ success: true, file: newFile });

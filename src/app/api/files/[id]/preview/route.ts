@@ -37,54 +37,12 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
     }
 
     const cleanExt = file.ext.toLowerCase();
-    const isOffice = ["docx", "doc", "pptx", "xlsx"].includes(cleanExt);
 
-    // If it's an Office document and pdf_key is not set, convert to PDF first! (PRD & User Request)
-    if (isOffice && !file.pdf_key) {
-      try {
-        const { data: fileBlob, error: downloadError } = await supabaseAdmin.storage
-          .from("uploads")
-          .download(file.storage_key);
-
-        if (!downloadError && fileBlob) {
-          const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
-          const { documentConverter } = await import("@/lib/converter/provider");
-          const pdfBuffer = await documentConverter.convertOfficeToPdf(fileBuffer, file.display_name);
-
-          const pdfKey = `${file.user_id}/${file.id}.pdf`;
-          const { error: uploadError } = await supabaseAdmin.storage
-            .from("derived")
-            .upload(pdfKey, pdfBuffer, {
-              contentType: "application/pdf",
-              upsert: true,
-            });
-
-          if (!uploadError) {
-            await supabaseAdmin
-              .from("files")
-              .update({
-                pdf_key: pdfKey,
-                status: "ready",
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", id);
-
-            file.pdf_key = pdfKey;
-          }
-        }
-      } catch (convErr: any) {
-        console.error("Auto conversion to PDF during preview failed:", convErr);
-      }
-    }
-
-    // 1. PDF File or Converted Document with pdf_key (Guarantees 100% exact layout as in MS Word)
-    if (cleanExt === "pdf" || file.pdf_key) {
-      const targetBucket = file.pdf_key ? "derived" : "uploads";
-      const targetKey = file.pdf_key || file.storage_key;
-
+    // 1. PDF File
+    if (cleanExt === "pdf") {
       const { data: fileBlob, error: downloadError } = await supabaseAdmin.storage
-        .from(targetBucket)
-        .download(targetKey);
+        .from("uploads")
+        .download(file.storage_key);
 
       if (downloadError || !fileBlob) {
         return NextResponse.json({ error: "Gagal mengambil file PDF dari penyimpanan." }, { status: 500 });
@@ -93,8 +51,6 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
       const arrayBuffer = await fileBlob.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const totalSize = buffer.length;
-
-      const pdfDisplayName = cleanExt === "pdf" ? file.display_name : `${file.display_name.replace(/\.[^/.]+$/, "")}.pdf`;
 
       // Handle HTTP Range requests (crucial for Chrome/Edge PDF plugin)
       const rangeHeader = req.headers.get("range");
@@ -110,7 +66,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
           headers.set("Content-Range", `bytes ${start}-${end}/${totalSize}`);
           headers.set("Accept-Ranges", "bytes");
           headers.set("Content-Length", String(chunk.length));
-          headers.set("Content-Disposition", `inline; filename="${pdfDisplayName}"`);
+          headers.set("Content-Disposition", `inline; filename="${file.display_name}"`);
           headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0");
 
           return new NextResponse(chunk, { status: 206, headers });
@@ -121,7 +77,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
       headers.set("Content-Type", "application/pdf");
       headers.set("Accept-Ranges", "bytes");
       headers.set("Content-Length", String(totalSize));
-      headers.set("Content-Disposition", `inline; filename="${pdfDisplayName}"`);
+      headers.set("Content-Disposition", `inline; filename="${file.display_name}"`);
       headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0");
 
       return new NextResponse(buffer, { status: 200, headers });
@@ -149,7 +105,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
       return new NextResponse(buffer, { status: 200, headers });
     }
 
-    // 3. Word DOCX Fallback Preview (when Gotenberg is offline)
+    // 3. Word DOCX Preview (HTML renderer via mammoth)
     if (["docx", "doc"].includes(cleanExt)) {
       const { data: fileBlob, error: downloadError } = await supabaseAdmin.storage
         .from("uploads")

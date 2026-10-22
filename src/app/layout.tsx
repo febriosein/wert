@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Platform simpan dokumen sementara untuk cetak di fotokopian tanpa perlu login WhatsApp.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="id"
