@@ -7,6 +7,7 @@ import { Dropzone } from "@/components/Dropzone";
 import { FileCard, FileItem } from "@/components/FileCard";
 import { QrModal, getCachedQrSession, setCachedQrSession } from "@/components/QrModal";
 import { DocumentViewerModal } from "@/components/DocumentViewerModal";
+import { DeleteFileModal } from "@/components/DeleteFileModal";
 import { Plus, QrCode, RefreshCw, Files, HardDrive, Smartphone, AlertCircle, ArrowUpRight } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { supabaseClient } from "@/lib/supabase/client";
@@ -28,6 +29,7 @@ export default function UserDashboardPage({ params }: PageProps) {
   const [files, setFiles] = useState<FileItem[]>(() => cachedData?.files || []);
   const [loading, setLoading] = useState(() => !cachedData);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [showAddFile, setShowAddFile] = useState(false);
 
@@ -113,9 +115,12 @@ export default function UserDashboardPage({ params }: PageProps) {
     };
   }, [loadFiles, loadDesktopQr, username]);
 
-  // Optimistic File Deletion (0ms response)
-  const handleDeleteFile = async (id: string) => {
-    if (!confirm("Hapus file ini permanen?")) return;
+  // File Deletion via Custom Confirmation Modal
+  const handleRequestDelete = (file: FileItem) => {
+    setFileToDelete(file);
+  };
+
+  const handleConfirmDelete = async (id: string) => {
     const previous = files;
     const nextFiles = files.filter((f) => f.id !== id);
 
@@ -124,6 +129,7 @@ export default function UserDashboardPage({ params }: PageProps) {
     if (filesCache[username]) {
       filesCache[username].files = nextFiles;
     }
+    setFileToDelete(null);
 
     try {
       const res = await fetch(`/api/files/${id}`, { method: "DELETE" });
@@ -342,7 +348,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                   key={file.id}
                   file={file}
                   onPreview={(f) => setSelectedFile(f)}
-                  onDelete={handleDeleteFile}
+                  onDelete={handleRequestDelete}
                   onRefresh={() => loadFiles(true)}
                   onOptimisticUpdate={handleOptimisticUpdate}
                 />
@@ -362,6 +368,13 @@ export default function UserDashboardPage({ params }: PageProps) {
       <DocumentViewerModal
         file={selectedFile}
         onClose={() => setSelectedFile(null)}
+      />
+
+      <DeleteFileModal
+        file={fileToDelete}
+        isOpen={Boolean(fileToDelete)}
+        onClose={() => setFileToDelete(null)}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

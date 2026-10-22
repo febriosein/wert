@@ -36,7 +36,7 @@ export interface FileItem {
 interface FileCardProps {
   file: FileItem;
   onPreview: (file: FileItem) => void;
-  onDelete: (id: string) => void;
+  onDelete: (file: FileItem) => void;
   onRefresh: () => void;
   onOptimisticUpdate?: (id: string, partial: Partial<FileItem>) => void;
 }
@@ -223,7 +223,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                       type="button"
                       onClick={() => {
                         setShowMenu(false);
-                        onDelete(file.id);
+                        onDelete(file);
                       }}
                       className="w-full text-left px-3.5 py-2 hover:bg-[#FFEAEC] text-[#D92D3A] font-semibold flex items-center gap-2 cursor-pointer"
                     >
