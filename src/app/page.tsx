@@ -32,6 +32,9 @@ export default function HomePage() {
     setLoading(true);
     setError(null);
 
+    // Eagerly prefetch the user dashboard route
+    router.prefetch(`/${cleanUsername}`);
+
     try {
       const res = await fetch("/api/auth/check", {
         method: "POST",
@@ -57,8 +60,9 @@ export default function HomePage() {
           // Requires PIN
           setStep("pin_prompt");
         } else {
-          // No PIN -> login immediately
-          await handleLoginDirect();
+          // No PIN -> already logged in in 1 single round-trip! Navigate immediately
+          router.push(`/${cleanUsername}`);
+          return;
         }
       }
     } catch (err: any) {
@@ -68,36 +72,21 @@ export default function HomePage() {
     }
   };
 
-  const handleLoginDirect = async () => {
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: cleanUsername }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal masuk");
-      router.push(`/${cleanUsername}`);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const handleLoginWithPin = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!pin || pin.length !== 4) {
+  const submitPin = async (pinValue: string) => {
+    if (!pinValue || pinValue.length !== 4) {
       setError("PIN harus berupa 4 angka numerik.");
       return;
     }
 
     setLoading(true);
     setError(null);
+    router.prefetch(`/${cleanUsername}`);
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: cleanUsername, pin }),
+        body: JSON.stringify({ username: cleanUsername, pin: pinValue }),
       });
 
       const data = await res.json();
@@ -111,14 +100,21 @@ export default function HomePage() {
       router.push(`/${cleanUsername}`);
     } catch (err: any) {
       setError(err.message);
+      setPin("");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleLoginWithPin = async (e: FormEvent) => {
+    e.preventDefault();
+    await submitPin(pin);
+  };
+
   const handleRegister = async (withPin: boolean) => {
     setLoading(true);
     setError(null);
+    router.prefetch(`/${cleanUsername}`);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -244,7 +240,13 @@ export default function HomePage() {
                       autoFocus
                       required
                       value={username}
-                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+                      onChange={(e) => {
+                        const val = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+                        setUsername(val);
+                        if (val.length >= 3) {
+                          router.prefetch(`/${val}`);
+                        }
+                      }}
                       placeholder="namaanda"
                       className="w-full py-3 pr-4 text-sm font-semibold bg-transparent focus:outline-none text-slate-900"
                     />
@@ -301,7 +303,13 @@ export default function HomePage() {
                     autoFocus
                     required
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setPin(val);
+                      if (val.length === 4) {
+                        submitPin(val);
+                      }
+                    }}
                     placeholder="••••"
                     className="w-36 text-center tracking-[1em] py-3 text-2xl font-bold rounded-2xl border border-slate-300 bg-slate-50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition"
                   />

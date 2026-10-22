@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { createSession } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,12 +41,40 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (isLocked) {
+      return NextResponse.json({
+        exists: true,
+        username: user.username,
+        hasPin: !!user.pin_hash,
+        isLocked: true,
+        lockRemainingSeconds,
+        loggedIn: false,
+      });
+    }
+
+    // High-performance optimization: If account has NO PIN, log the user in immediately!
+    // Creates session and sets HttpOnly cookie in this single round-trip.
+    if (!user.pin_hash) {
+      const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
+      await createSession(user.id, ip);
+
+      return NextResponse.json({
+        exists: true,
+        username: user.username,
+        hasPin: false,
+        isLocked: false,
+        lockRemainingSeconds: 0,
+        loggedIn: true,
+      });
+    }
+
     return NextResponse.json({
       exists: true,
       username: user.username,
-      hasPin: !!user.pin_hash,
-      isLocked,
-      lockRemainingSeconds,
+      hasPin: true,
+      isLocked: false,
+      lockRemainingSeconds: 0,
+      loggedIn: false,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });

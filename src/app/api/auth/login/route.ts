@@ -43,9 +43,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
+
     // If account has no PIN -> login directly
     if (!user.pin_hash) {
-      const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
       await createSession(user.id, ip);
       return NextResponse.json({ success: true, username: user.username });
     }
@@ -97,17 +98,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Reset failed attempts on success
-    await supabaseAdmin
-      .from("users")
-      .update({
-        pin_failed_count: 0,
-        pin_locked_until: null,
-      })
-      .eq("id", user.id);
-
-    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
-    await createSession(user.id, ip);
+    // Reset failed attempts on success only if count > 0 or locked_until was set
+    if ((user.pin_failed_count || 0) > 0 || user.pin_locked_until) {
+      await Promise.all([
+        supabaseAdmin
+          .from("users")
+          .update({
+            pin_failed_count: 0,
+            pin_locked_until: null,
+          })
+          .eq("id", user.id),
+        createSession(user.id, ip),
+      ]);
+    } else {
+      await createSession(user.id, ip);
+    }
 
     return NextResponse.json({ success: true, username: user.username });
   } catch (err: any) {
