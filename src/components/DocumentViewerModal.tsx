@@ -113,29 +113,29 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-ink/60 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="relative w-full max-w-[1080px] h-[90vh] rounded-[28px] bg-surface shadow-2xl border border-line flex flex-col overflow-hidden text-left">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#10241B]/60 backdrop-blur-md animate-in fade-in duration-150">
+      <div className="relative w-full max-w-[1080px] h-[90vh] rounded-[28px] bg-white shadow-2xl border border-[#D5EADF] flex flex-col overflow-hidden text-left">
         {/* Header Modal Toolbar */}
-        <header className="bg-surface px-6 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-line select-none shrink-0">
+        <header className="bg-white px-6 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-[#D5EADF] select-none shrink-0">
           {/* File Metadata (Left Side) */}
           <div className="flex items-center gap-3.5 min-w-0 max-w-[50%]">
-            <div className="w-11 h-11 rounded-2xl bg-mint text-brand-deep flex items-center justify-center shrink-0 border border-line shadow-sm">
+            <div className="w-11 h-11 rounded-2xl bg-[#E3F8EC] text-[#087443] flex items-center justify-center shrink-0 border border-[#D5EADF] shadow-sm">
               {isImage ? (
-                <ImageIcon className="w-5 h-5 text-brand-deep" />
+                <ImageIcon className="w-5 h-5 text-[#087443]" />
               ) : (
-                <FileText className="w-5 h-5 text-brand-deep" />
+                <FileText className="w-5 h-5 text-[#087443]" />
               )}
             </div>
             <div className="truncate">
               <div className="flex items-center gap-2">
-                <h2 className="font-display font-bold text-base sm:text-lg text-ink truncate" title={file.display_name}>
+                <h2 className="font-display font-bold text-base sm:text-lg text-[#10241B] truncate" title={file.display_name}>
                   {file.display_name}
                 </h2>
-                <span className="text-[10px] font-bold uppercase bg-mint text-brand-deep px-2 py-0.5 rounded-full border border-line shrink-0">
+                <span className="text-[10px] font-bold uppercase bg-[#E3F8EC] text-[#087443] px-2 py-0.5 rounded-full border border-[#D5EADF] shrink-0">
                   {file.ext}
                 </span>
               </div>
-              <p className="text-xs text-muted mt-0.5">
+              <p className="text-xs text-[#587063] mt-0.5">
                 {formatBytes(file.size_bytes)}
               </p>
             </div>
@@ -149,7 +149,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
                 type="button"
                 onClick={handlePrint}
                 disabled={printing}
-                className="inline-flex items-center gap-2 bg-brand-deep hover:bg-[#065b34] text-white font-display text-xs sm:text-sm font-bold px-5 sm:px-6 py-2.5 rounded-2xl shadow-sm transition-all active:scale-95 duration-150 cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 bg-[#087443] hover:bg-[#065b34] text-white font-display text-xs sm:text-sm font-bold px-5 sm:px-6 py-2.5 rounded-2xl shadow-sm transition-all active:scale-95 duration-150 cursor-pointer disabled:opacity-50"
               >
                 {printing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
                 <span>Cetak dokumen</span>
@@ -161,7 +161,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               href={previewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-surface hover:bg-mint text-ink font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl border border-line transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-white hover:bg-[#E3F8EC] text-[#10241B] font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl border border-[#D5EADF] transition-colors"
               title="Buka pratinjau di tab baru"
             >
               <ExternalLink className="w-4 h-4" />
@@ -171,7 +171,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
             {/* Secondary: Download */}
             <a
               href={downloadUrl}
-              className="hidden sm:inline-flex items-center gap-1.5 bg-surface hover:bg-mint text-ink font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl border border-line transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-white hover:bg-[#E3F8EC] text-[#10241B] font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl border border-[#D5EADF] transition-colors"
               title="Unduh file"
             >
               <Download className="w-4 h-4" />
@@ -182,7 +182,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
             <button
               type="button"
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-surface hover:bg-mint text-muted hover:text-ink border border-line transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-[#E3F8EC] text-[#587063] hover:text-[#10241B] border border-[#D5EADF] transition-colors cursor-pointer"
               title="Tutup dialog"
               aria-label="Tutup Dialog"
             >
@@ -191,49 +191,49 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
           </div>
         </header>
 
-        {/* Crisp Mint Backdrop (#E3F8EC) instead of murky dark grays */}
-        <main className="relative flex-1 bg-mint/50 overflow-auto p-4 sm:p-8 flex justify-center items-start">
+        {/* Crisp Mint Backdrop (#E3F8EC) */}
+        <main className="relative flex-1 bg-[#E3F8EC]/50 overflow-auto p-4 sm:p-8 flex justify-center items-start">
           {/* ZIP Viewer */}
           {isZip ? (
-            <div className="w-full max-w-2xl bg-surface rounded-[24px] border border-line shadow-soft p-6 flex flex-col gap-4 max-h-[75vh] overflow-hidden my-auto">
+            <div className="w-full max-w-2xl bg-white rounded-[24px] border border-[#D5EADF] shadow-soft p-6 flex flex-col gap-4 max-h-[75vh] overflow-hidden my-auto">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-hl-soft text-ink flex items-center justify-center shrink-0 border border-hl">
-                  <FolderArchive className="w-6 h-6 text-brand-deep" />
+                <div className="w-12 h-12 rounded-2xl bg-[#FFF4B8] text-[#10241B] flex items-center justify-center shrink-0 border border-[#FFE45C]">
+                  <FolderArchive className="w-6 h-6 text-[#087443]" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-ink text-base">Daftar Isi Arsip ZIP</h3>
-                  <p className="text-xs text-muted">
+                  <h3 className="font-display font-bold text-[#10241B] text-base">Daftar Isi Arsip ZIP</h3>
+                  <p className="text-xs text-[#587063]">
                     Isi arsip dibaca langsung dari central directory tanpa diekstrak di server.
                   </p>
                 </div>
               </div>
 
               {loadingZip ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-2 text-muted">
-                  <Loader2 className="w-6 h-6 animate-spin text-brand-deep" />
+                <div className="flex flex-col items-center justify-center py-12 gap-2 text-[#587063]">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#087443]" />
                   <span className="text-xs">Membaca daftar file...</span>
                 </div>
               ) : zipEntries.length === 0 ? (
-                <div className="text-center py-8 text-xs text-muted">
+                <div className="text-center py-8 text-xs text-[#587063]">
                   Arsip kosong atau tidak dapat dibaca.
                 </div>
               ) : (
-                <div className="border border-line rounded-2xl overflow-auto max-h-[50vh] divide-y divide-line bg-surface">
+                <div className="border border-[#D5EADF] rounded-2xl overflow-auto max-h-[50vh] divide-y divide-[#D5EADF] bg-white">
                   {zipEntries.map((entry, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between px-4 py-3 text-xs hover:bg-mint/40 transition"
+                      className="flex items-center justify-between px-4 py-3 text-xs hover:bg-[#E3F8EC]/40 transition"
                     >
                       <div className="flex items-center gap-2.5 truncate max-w-[80%]">
                         {entry.isDirectory ? (
                           <Folder className="w-4 h-4 text-amber-500 shrink-0" />
                         ) : (
-                          <File className="w-4 h-4 text-muted shrink-0" />
+                          <File className="w-4 h-4 text-[#587063] shrink-0" />
                         )}
-                        <span className="font-medium text-ink truncate">{entry.name}</span>
+                        <span className="font-medium text-[#10241B] truncate">{entry.name}</span>
                       </div>
                       {!entry.isDirectory && (
-                        <span className="text-muted text-[11px] shrink-0 font-mono">
+                        <span className="text-[#587063] text-[11px] shrink-0 font-mono">
                           {formatBytes(entry.sizeBytes)}
                         </span>
                       )}
@@ -246,7 +246,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
             /* Image Preview on White Sheet */
             <div className="flex flex-col items-center justify-center w-full min-h-full">
               <div
-                className="bg-surface rounded-2xl border border-line shadow-md p-4 max-w-full overflow-hidden transition-transform duration-200"
+                className="bg-white rounded-2xl border border-[#D5EADF] shadow-md p-4 max-w-full overflow-hidden transition-transform duration-200"
                 style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "center center" }}
               >
                 <img
@@ -257,20 +257,20 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               </div>
 
               {/* Floating Bottom Toolbar for Images */}
-              <div className="sticky bottom-4 mt-4 inline-flex items-center gap-1.5 bg-surface border border-line rounded-full px-3 py-1.5 shadow-md text-xs font-semibold z-20">
+              <div className="sticky bottom-4 mt-4 inline-flex items-center gap-1.5 bg-white border border-[#D5EADF] rounded-full px-3 py-1.5 shadow-md text-xs font-semibold z-20">
                 <button
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.max(50, z - 25))}
-                  className="p-1 hover:bg-mint rounded-full text-muted hover:text-ink transition"
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition"
                   title="Perkecil"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
-                <span className="w-12 text-center text-ink">{zoomLevel}%</span>
+                <span className="w-12 text-center text-[#10241B]">{zoomLevel}%</span>
                 <button
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.min(250, z + 25))}
-                  className="p-1 hover:bg-mint rounded-full text-muted hover:text-ink transition"
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition"
                   title="Perbesar"
                 >
                   <ZoomIn className="w-4 h-4" />
@@ -278,7 +278,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
                 <button
                   type="button"
                   onClick={() => setZoomLevel(100)}
-                  className="p-1 hover:bg-mint rounded-full text-muted hover:text-ink ml-1 border-l border-line pl-2 transition"
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] ml-1 border-l border-[#D5EADF] pl-2 transition"
                   title="Reset Ukuran"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
@@ -289,22 +289,22 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
             /* Document / PDF Iframe Preview */
             <div className="w-full h-full flex flex-col items-center justify-center relative">
               {!iframeLoaded && !iframeError && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-mint/60 z-10">
-                  <Loader2 className="w-8 h-8 animate-spin text-brand-deep" />
-                  <span className="font-display font-semibold text-sm text-ink">Menyiapkan pratinjau dokumen...</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#E3F8EC]/60 z-10">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#087443]" />
+                  <span className="font-display font-semibold text-sm text-[#10241B]">Menyiapkan pratinjau dokumen...</span>
                 </div>
               )}
 
               {iframeError ? (
-                <div className="p-8 rounded-[24px] bg-surface border border-line text-center max-w-md shadow-soft">
-                  <AlertCircle className="w-10 h-10 text-danger mx-auto mb-3" />
-                  <h3 className="font-display font-bold text-base text-ink">Pratinjau Belum Tersedia</h3>
-                  <p className="text-xs text-muted mt-1 mb-4 leading-relaxed">
+                <div className="p-8 rounded-[24px] bg-white border border-[#D5EADF] text-center max-w-md shadow-soft">
+                  <AlertCircle className="w-10 h-10 text-[#D92D3A] mx-auto mb-3" />
+                  <h3 className="font-display font-bold text-base text-[#10241B]">Pratinjau Belum Tersedia</h3>
+                  <p className="text-xs text-[#587063] mt-1 mb-4 leading-relaxed">
                     Browser tidak dapat merender pratinjau ini secara langsung. Kamu tetap dapat mengunduh atau mencetak file aslinya.
                   </p>
                   <a
                     href={downloadUrl}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-deep text-white text-xs font-bold shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#087443] text-white text-xs font-bold shadow-sm"
                   >
                     <Download className="w-4 h-4" />
                     <span>Unduh File</span>
@@ -314,7 +314,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
                 <iframe
                   src={previewUrl}
                   title={file.display_name}
-                  className="w-full h-full rounded-2xl bg-surface border border-line shadow-md"
+                  className="w-full h-full rounded-2xl bg-white border border-[#D5EADF] shadow-md"
                   onLoad={() => setIframeLoaded(true)}
                   onError={() => setIframeError(true)}
                 />
@@ -328,9 +328,9 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
 
         {/* Photocopy Privacy Logout Prompt after printing */}
         {showLogoutPrompt && (
-          <div className="p-4 bg-hl-soft border-t border-hl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-ink">
-              <Check className="w-4 h-4 text-brand-deep shrink-0" />
+          <div className="p-4 bg-[#FFF4B8] border-t border-[#FFE45C] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-[#10241B]">
+              <Check className="w-4 h-4 text-[#087443] shrink-0" />
               <span>
                 <b>Dokumen dikirim ke printer!</b> Jika selesai menggunakan komputer fotokopi, silakan keluar untuk keamanan privasi Anda.
               </span>
@@ -339,7 +339,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               <button
                 type="button"
                 onClick={handleLogout}
-                className="px-3.5 py-1.5 rounded-xl bg-danger hover:bg-red-700 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="px-3.5 py-1.5 rounded-xl bg-[#D92D3A] hover:bg-red-700 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Keluar Sekarang</span>
@@ -347,7 +347,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               <button
                 type="button"
                 onClick={() => setShowLogoutPrompt(false)}
-                className="px-3 py-1.5 rounded-xl bg-surface border border-line text-ink hover:bg-mint transition cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-white border border-[#D5EADF] text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer"
               >
                 Tetap di Halaman
               </button>

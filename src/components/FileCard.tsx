@@ -148,17 +148,17 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
   return (
     <>
-      <div className="group relative bg-surface rounded-[20px] overflow-hidden border border-line shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div className="group relative bg-white rounded-[20px] overflow-hidden border border-[#D5EADF] shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
         {/* Critical Expiration Accent: 3px red left bar if < 6 hours */}
         {isUrgent && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-danger z-20"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D92D3A] z-20"></div>
         )}
 
         <div>
           {/* Top Panel (112px) Color-Coded by File Type */}
           <div className={`h-28 w-full ${style.bg} relative flex items-center justify-center overflow-hidden`}>
             {/* Center File Icon / Preview Tile */}
-            <div className="w-14 h-14 rounded-2xl bg-surface shadow-sm flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+            <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
               {style.icon}
             </div>
 
@@ -167,7 +167,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
               <button
                 type="button"
                 onClick={() => setShowMenu(!showMenu)}
-                className="w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md text-muted hover:text-ink hover:bg-surface flex items-center justify-center shadow-sm transition-all"
+                className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md text-[#587063] hover:text-[#10241B] hover:bg-white flex items-center justify-center shadow-sm transition-all cursor-pointer"
                 title="Opsi File"
                 aria-label="Opsi File"
               >
@@ -175,14 +175,14 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-10 z-30 w-52 rounded-2xl bg-surface border border-line shadow-xl py-1.5 text-xs text-ink animate-in fade-in">
+                <div className="absolute right-0 top-10 z-30 w-52 rounded-2xl bg-white border border-[#D5EADF] shadow-xl py-1.5 text-xs text-[#10241B] animate-in fade-in">
                   <button
                     type="button"
                     onClick={() => {
                       setShowMenu(false);
                       setShowReplaceModal(true);
                     }}
-                    className="w-full text-left px-3.5 py-2 hover:bg-mint flex items-center gap-2 font-medium"
+                    className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
                     <span>Ganti File (Update)</span>
@@ -192,7 +192,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                     <button
                       type="button"
                       onClick={handleExtend}
-                      className="w-full text-left px-3.5 py-2 hover:bg-mint flex items-center gap-2 text-brand-deep font-semibold"
+                      className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 text-[#087443] font-semibold cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Perpanjang 48 Jam</span>
@@ -202,13 +202,13 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                   <button
                     type="button"
                     onClick={handleToggleAutoDelete}
-                    className="w-full text-left px-3.5 py-2 hover:bg-mint flex items-center gap-2"
+                    className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 cursor-pointer"
                   >
-                    <Clock className="w-3.5 h-3.5 text-muted" />
+                    <Clock className="w-3.5 h-3.5 text-[#587063]" />
                     <span>{file.expires_at ? "Matikan Hapus Otomatis" : "Aktifkan Hapus 48 Jam"}</span>
                   </button>
 
-                  <div className="h-px bg-line my-1" />
+                  <div className="h-px bg-[#D5EADF] my-1" />
 
                   <button
                     type="button"
@@ -216,7 +216,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                       setShowMenu(false);
                       onDelete(file.id);
                     }}
-                    className="w-full text-left px-3.5 py-2 hover:bg-danger-soft text-danger font-semibold flex items-center gap-2"
+                    className="w-full text-left px-3.5 py-2 hover:bg-[#FFEAEC] text-[#D92D3A] font-semibold flex items-center gap-2 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Hapus File</span>
@@ -231,7 +231,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
             {/* File Name (max 2 lines) */}
             <h3
               onClick={() => onPreview(file)}
-              className="font-display font-bold text-base text-ink line-clamp-2 leading-snug group-hover:text-brand-deep transition-colors min-h-[44px] cursor-pointer"
+              className="font-display font-bold text-base text-[#10241B] line-clamp-2 leading-snug group-hover:text-[#087443] transition-colors min-h-[44px] cursor-pointer"
               title={file.display_name}
             >
               {file.display_name}
@@ -242,7 +242,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-[8px] uppercase tracking-wider ${style.badgeBg}`}>
                 {file.ext}
               </span>
-              <span className="text-muted text-xs font-medium">
+              <span className="text-[#587063] text-xs font-medium">
                 • {formatBytes(file.size_bytes)}
               </span>
             </div>
@@ -250,22 +250,22 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
             {/* Countdown pill with exact design token colors */}
             <div className="mt-3.5">
               {!file.expires_at ? (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDF3EF] text-muted text-xs font-semibold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDF3EF] text-[#587063] text-xs font-semibold">
                   <Pin className="w-3.5 h-3.5" />
                   <span>Disimpan terus</span>
                 </div>
               ) : countdown.isUrgent ? (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-danger-soft text-danger text-xs font-bold border border-danger/30 animate-pulse">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFEAEC] text-[#D92D3A] text-xs font-bold border border-[#D92D3A]/30 animate-pulse">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{countdown.text}</span>
                 </div>
               ) : countdown.isWarning ? (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-hl-soft text-ink text-xs font-semibold border border-hl">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF4B8] text-[#10241B] text-xs font-semibold border border-[#FFE45C]">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{countdown.text}</span>
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint text-brand-deep text-xs font-semibold border border-line">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3F8EC] text-[#087443] text-xs font-semibold border border-[#D5EADF]">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{countdown.text}</span>
                 </div>
@@ -279,7 +279,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
           <button
             type="button"
             onClick={() => onPreview(file)}
-            className="flex-1 py-2.5 px-4 rounded-[14px] bg-brand-deep hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all cursor-pointer"
+            className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>Lihat & cetak</span>
@@ -287,7 +287,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
           <a
             href={`/api/files/${file.id}/download`}
-            className="w-11 h-11 shrink-0 rounded-[14px] bg-bg hover:bg-mint border border-line text-ink flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] flex items-center justify-center transition-colors cursor-pointer"
             title="Unduh file"
             aria-label="Unduh file"
           >
@@ -298,19 +298,19 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
       {/* Replace File Modal */}
       {showReplaceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-lg rounded-[28px] bg-surface p-6 sm:p-8 shadow-2xl border border-line flex flex-col gap-4 text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#10241B]/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg rounded-[28px] bg-white p-6 sm:p-8 shadow-2xl border border-[#D5EADF] flex flex-col gap-4 text-left">
             <button
               type="button"
               onClick={() => setShowReplaceModal(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl text-muted hover:text-ink hover:bg-mint transition"
+              className="absolute top-5 right-5 p-2 rounded-xl text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div>
-              <h3 className="font-display text-xl font-bold text-ink">Ganti File Dokumen</h3>
-              <p className="text-xs text-muted mt-1 leading-relaxed">
+              <h3 className="font-display text-xl font-bold text-[#10241B]">Ganti File Dokumen</h3>
+              <p className="text-xs text-[#587063] mt-1 leading-relaxed">
                 Mengganti isi file <b>{file.display_name}</b> secara atomik. Timer 48 jam akan di-reset dan pratinjau diperbarui.
               </p>
             </div>

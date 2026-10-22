@@ -275,8 +275,8 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
         onClick={() => fileInputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-[24px] p-8 sm:p-12 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
           isDragging
-            ? "border-brand-deep bg-mint/90 scale-[1.01]"
-            : "border-line hover:border-brand-deep/50 bg-surface hover:bg-mint/20 shadow-soft"
+            ? "border-[#087443] bg-[#E3F8EC]/90 scale-[1.01]"
+            : "border-[#D5EADF] hover:border-[#087443]/50 bg-white hover:bg-[#E3F8EC]/20 shadow-soft"
         }`}
       >
         <input
@@ -296,15 +296,15 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
           className="hidden"
         />
 
-        <div className="w-16 h-16 rounded-2xl bg-mint flex items-center justify-center text-brand-deep mb-1 border border-line shadow-sm">
+        <div className="w-16 h-16 rounded-2xl bg-[#E3F8EC] flex items-center justify-center text-[#087443] mb-1 border border-[#D5EADF] shadow-sm">
           <UploadCloud className="w-8 h-8" />
         </div>
 
         <div>
-          <h3 className="font-display font-bold text-ink text-lg sm:text-xl">
+          <h3 className="font-display font-bold text-[#10241B] text-lg sm:text-xl">
             {replaceFileId ? "Pilih file pengganti" : "Tarik file tugas ke sini atau klik untuk memilih"}
           </h3>
-          <p className="text-muted text-xs sm:text-sm mt-1">
+          <p className="text-[#587063] text-xs sm:text-sm mt-1">
             Word (.docx), PDF (.pdf), Excel (.xlsx), PPTX, Foto (JPG, PNG, HEIC), ZIP (Maks. 50 MB)
           </p>
         </div>
@@ -317,7 +317,7 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold bg-brand-deep hover:bg-[#065b34] text-white shadow-sm transition cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold bg-[#087443] hover:bg-[#065b34] text-white shadow-sm transition cursor-pointer"
           >
             Pilih File
           </button>
@@ -325,9 +325,9 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-surface hover:bg-mint text-ink border border-line shadow-sm transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white hover:bg-[#E3F8EC] text-[#10241B] border border-[#D5EADF] shadow-sm transition cursor-pointer"
           >
-            <Camera className="w-4 h-4 text-brand-deep" />
+            <Camera className="w-4 h-4 text-[#087443]" />
             <span>Ambil Foto</span>
           </button>
         </div>

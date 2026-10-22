@@ -24,9 +24,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${plusJakarta.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${plusJakarta.variable} ${bricolage.variable} h-full antialiased light`}
+      style={{ colorScheme: "light" }}
     >
-      <body className="min-h-full flex flex-col font-sans bg-bg text-ink" suppressHydrationWarning>
+      <body
+        className="min-h-full flex flex-col font-sans bg-[#F4FBF7] text-[#10241B]"
+        style={{ backgroundColor: "#F4FBF7", color: "#10241B", colorScheme: "light" }}
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

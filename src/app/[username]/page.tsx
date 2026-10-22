@@ -153,7 +153,7 @@ export default function UserDashboardPage({ params }: PageProps) {
   const isStorageCritical = storagePercent >= 95;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg text-ink selection:bg-mint selection:text-brand-deep">
+    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
       <Navbar username={username} onOpenQr={() => setIsQrModalOpen(true)} />
 
       <main className="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -162,20 +162,20 @@ export default function UserDashboardPage({ params }: PageProps) {
           <div className="flex flex-col gap-8 animate-pulse">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-2">
-                <div className="h-8 w-48 bg-line rounded-xl" />
-                <div className="h-4 w-64 bg-line/60 rounded-lg" />
+                <div className="h-8 w-48 bg-[#D5EADF] rounded-xl" />
+                <div className="h-4 w-64 bg-[#D5EADF]/60 rounded-lg" />
               </div>
-              <div className="h-12 w-36 bg-line rounded-2xl" />
+              <div className="h-12 w-36 bg-[#D5EADF] rounded-2xl" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-64 bg-surface border border-line rounded-[20px] p-4 flex flex-col justify-between">
-                  <div className="h-28 bg-line/50 rounded-xl" />
+                <div key={i} className="h-64 bg-white border border-[#D5EADF] rounded-[20px] p-4 flex flex-col justify-between">
+                  <div className="h-28 bg-[#D5EADF]/50 rounded-xl" />
                   <div className="space-y-2">
-                    <div className="h-4 w-3/4 bg-line rounded" />
-                    <div className="h-3 w-1/3 bg-line/60 rounded" />
+                    <div className="h-4 w-3/4 bg-[#D5EADF] rounded" />
+                    <div className="h-3 w-1/3 bg-[#D5EADF]/60 rounded" />
                   </div>
-                  <div className="h-10 bg-line/40 rounded-xl" />
+                  <div className="h-10 bg-[#D5EADF]/40 rounded-xl" />
                 </div>
               ))}
             </div>
@@ -186,10 +186,10 @@ export default function UserDashboardPage({ params }: PageProps) {
             {/* Header info */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-left">
               <div>
-                <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-ink tracking-tight">
+                <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#10241B] tracking-tight">
                   File tugasmu
                 </h1>
-                <p className="text-sm text-muted mt-1">
+                <p className="text-sm text-[#587063] mt-1">
                   Belum ada file. Tarik file ke sini, atau scan QR dari HP.
                 </p>
               </div>
@@ -198,16 +198,16 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="px-4 py-2.5 rounded-[14px] bg-surface border border-line text-ink font-semibold text-xs sm:text-sm hover:bg-mint transition flex items-center gap-2 shadow-sm cursor-pointer"
+                  className="px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-2 shadow-sm cursor-pointer"
                 >
-                  <QrCode className="w-4 h-4 text-brand-deep" />
+                  <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowAddFile(true)}
-                  className="px-5 py-2.5 rounded-[14px] bg-brand-deep text-white font-display font-bold text-sm border-2 border-ink shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2.5 rounded-[14px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>
@@ -222,20 +222,20 @@ export default function UserDashboardPage({ params }: PageProps) {
               </div>
 
               {/* QR Card (Desktop view) */}
-              <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-6 rounded-[24px] bg-surface border border-line shadow-soft text-center">
+              <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-6 rounded-[24px] bg-white border border-[#D5EADF] shadow-soft text-center">
                 <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-2xl bg-mint text-brand-deep flex items-center justify-center mb-2 shadow-sm border border-line">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E3F8EC] text-[#087443] flex items-center justify-center mb-2 shadow-sm border border-[#D5EADF]">
                     <Smartphone className="w-6 h-6" />
                   </div>
-                  <h3 className="font-display font-bold text-ink text-lg">Upload dari Smartphone</h3>
-                  <p className="text-xs text-muted mt-1 max-w-xs">
+                  <h3 className="font-display font-bold text-[#10241B] text-lg">Upload dari Smartphone</h3>
+                  <p className="text-xs text-[#587063] mt-1 max-w-xs">
                     Buka kamera HP Anda, scan QR ini untuk upload langsung tanpa perlu login.
                   </p>
 
-                  <div className="relative w-52 h-52 border-2 border-ink rounded-2xl p-2 bg-surface flex items-center justify-center shadow-sticker my-5 overflow-hidden">
+                  <div className="relative w-52 h-52 border-2 border-[#10241B] rounded-2xl p-2 bg-white flex items-center justify-center shadow-sticker my-5 overflow-hidden">
                     {desktopQrLoading && !desktopQrDataUrl ? (
-                      <div className="w-full h-full bg-bg rounded-xl animate-pulse flex flex-col items-center justify-center gap-2 text-muted">
-                        <RefreshCw className="w-6 h-6 animate-spin text-brand-deep" />
+                      <div className="w-full h-full bg-[#F4FBF7] rounded-xl animate-pulse flex flex-col items-center justify-center gap-2 text-[#587063]">
+                        <RefreshCw className="w-6 h-6 animate-spin text-[#087443]" />
                         <span className="text-xs">Membuat QR...</span>
                       </div>
                     ) : desktopQrDataUrl ? (
@@ -245,17 +245,17 @@ export default function UserDashboardPage({ params }: PageProps) {
                         className="w-full h-full object-contain rounded-xl"
                       />
                     ) : (
-                      <span className="text-xs text-muted">Gagal memuat QR</span>
+                      <span className="text-xs text-[#587063]">Gagal memuat QR</span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-line">
+                <div className="flex items-center justify-between text-xs text-[#587063] pt-3 border-t border-[#D5EADF]">
                   <span>Otomatis tampil di layar ini</span>
                   <button
                     type="button"
                     onClick={() => loadDesktopQr(true)}
-                    className="inline-flex items-center gap-1 font-bold text-brand-deep hover:underline transition"
+                    className="inline-flex items-center gap-1 font-bold text-[#087443] hover:underline transition cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Perbarui QR</span>
@@ -270,19 +270,19 @@ export default function UserDashboardPage({ params }: PageProps) {
             {/* Header: Title, Storage Progress Meter, & Action Buttons */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-left">
               <div>
-                <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-ink tracking-tight">
+                <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#10241B] tracking-tight">
                   File tugasmu
                 </h1>
                 {/* Meta Summary + Progress Meter */}
                 <div className="flex flex-col gap-2 mt-2">
-                  <div className="flex items-center gap-2 text-sm text-muted">
-                    <span className="font-semibold text-ink">{files.length} file</span>
+                  <div className="flex items-center gap-2 text-sm text-[#587063]">
+                    <span className="font-semibold text-[#10241B]">{files.length} file</span>
                     <span>·</span>
                     <span>{formatBytes(totalSize)} dari 200 MB</span>
                     {isStorageWarning && (
                       <Link
                         href={`/${username}/settings`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-hl-soft px-2 py-0.5 rounded-full border border-hl ml-2 hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-[#FFF4B8] px-2 py-0.5 rounded-full border border-[#FFE45C] ml-2 hover:underline"
                       >
                         <AlertCircle className="w-3 h-3" />
                         <span>Atur penyimpanan</span>
@@ -290,10 +290,10 @@ export default function UserDashboardPage({ params }: PageProps) {
                     )}
                   </div>
                   {/* Thin Progress Meter (height 6px, radius 999) */}
-                  <div className="w-48 sm:w-64 h-1.5 rounded-full bg-line overflow-hidden">
+                  <div className="w-48 sm:w-64 h-1.5 rounded-full bg-[#D5EADF] overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
-                        isStorageCritical ? "bg-danger" : isStorageWarning ? "bg-hl" : "bg-brand"
+                        isStorageCritical ? "bg-[#D92D3A]" : isStorageWarning ? "bg-[#FFE45C]" : "bg-[#19C37D]"
                       }`}
                       style={{ width: `${storagePercent}%` }}
                     />
@@ -306,16 +306,16 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="px-4 py-3 rounded-[16px] bg-surface border border-line text-ink font-semibold text-xs sm:text-sm hover:bg-mint transition flex items-center gap-2 shadow-sm cursor-pointer"
+                  className="px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-2 shadow-sm cursor-pointer"
                 >
-                  <QrCode className="w-4 h-4 text-brand-deep" />
+                  <QrCode className="w-4 h-4 text-[#087443]" />
                   <span className="hidden sm:inline">Upload dari HP</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowAddFile(!showAddFile)}
-                  className="px-5 py-3 rounded-[16px] bg-brand-deep text-white font-display font-bold text-sm border-2 border-ink shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-3 rounded-[16px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>
@@ -325,7 +325,7 @@ export default function UserDashboardPage({ params }: PageProps) {
 
             {/* Collapsible Dropzone */}
             {showAddFile && (
-              <div className="p-4 sm:p-6 rounded-[24px] bg-surface border border-line shadow-soft animate-in fade-in">
+              <div className="p-4 sm:p-6 rounded-[24px] bg-white border border-[#D5EADF] shadow-soft animate-in fade-in">
                 <Dropzone
                   onUploadSuccess={() => {
                     loadFiles(true);

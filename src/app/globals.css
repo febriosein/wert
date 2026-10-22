@@ -19,6 +19,7 @@
 }
 
 :root {
+  color-scheme: light !important;
   --ink: #10241B;
   --muted: #587063;
   --bg: #F4FBF7;
@@ -35,25 +36,100 @@
   --shadow-sticker: 4px 4px 0 #10241B;
 }
 
+html {
+  color-scheme: light !important;
+  background-color: #F4FBF7 !important;
+}
+
 body {
-  background-color: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  color-scheme: light !important;
+  background-color: #F4FBF7 !important;
+  color: #10241B !important;
+  font-family: var(--font-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Explicit Utility Classes to guarantee 100% reliable rendering */
+.bg-bg {
+  background-color: #F4FBF7 !important;
+}
+
+.bg-surface {
+  background-color: #FFFFFF !important;
+}
+
+.text-ink {
+  color: #10241B !important;
+}
+
+.text-muted {
+  color: #587063 !important;
+}
+
+.border-line {
+  border-color: #D5EADF !important;
+}
+
+.border-ink {
+  border-color: #10241B !important;
+}
+
+.bg-mint {
+  background-color: #E3F8EC !important;
+}
+
+.text-brand {
+  color: #19C37D !important;
+}
+
+.bg-brand {
+  background-color: #19C37D !important;
+}
+
+.text-brand-deep {
+  color: #087443 !important;
+}
+
+.bg-brand-deep {
+  background-color: #087443 !important;
+}
+
+.bg-hl {
+  background-color: #FFE45C !important;
+}
+
+.bg-hl-soft {
+  background-color: #FFF4B8 !important;
+}
+
+.bg-danger {
+  background-color: #D92D3A !important;
+}
+
+.text-danger {
+  color: #D92D3A !important;
+}
+
+.bg-danger-soft {
+  background-color: #FFEAEC !important;
 }
 
 /* Custom Sticker Shadows from design.md */
 .shadow-sticker {
-  box-shadow: 4px 4px 0 #10241B;
+  box-shadow: 4px 4px 0 #10241B !important;
 }
 
 .shadow-sticker-sm {
-  box-shadow: 2px 2px 0 #10241B;
+  box-shadow: 2px 2px 0 #10241B !important;
 }
 
 .shadow-sticker-lg {
-  box-shadow: 6px 6px 0 #10241B;
+  box-shadow: 6px 6px 0 #10241B !important;
+}
+
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(8, 116, 67, 0.06), 0 8px 24px rgba(8, 116, 67, 0.08) !important;
 }
 
 .font-display {
-  font-family: var(--font-bricolage), system-ui, sans-serif;
+  font-family: var(--font-bricolage), system-ui, sans-serif !important;
 }
