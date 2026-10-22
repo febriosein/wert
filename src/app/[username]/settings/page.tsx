@@ -23,13 +23,17 @@ interface PageProps {
   params: Promise<{ username: string }>;
 }
 
+// Global in-memory cache to ensure 0ms instantaneous navigation
+const settingsCache: Record<string, any> = {};
+
 export default function SettingsPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const username = resolvedParams.username.toLowerCase();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
+  const cached = settingsCache[username];
+  const [data, setData] = useState<any>(() => cached || null);
+  const [loading, setLoading] = useState(() => !cached);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -46,11 +50,15 @@ export default function SettingsPage({ params }: PageProps) {
   const [deleteAccountPin, setDeleteAccountPin] = useState("");
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
-  const loadSettings = async () => {
+  const loadSettings = async (silent = false) => {
+    if (!silent && !settingsCache[username]) {
+      setLoading(true);
+    }
     try {
       const res = await fetch("/api/settings");
       if (res.ok) {
         const json = await res.json();
+        settingsCache[username] = json;
         setData(json);
       }
     } catch (err) {
@@ -61,8 +69,8 @@ export default function SettingsPage({ params }: PageProps) {
   };
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    loadSettings(Boolean(settingsCache[username]));
+  }, [username]);
 
   const handleToggleAutoDelete = async () => {
     if (!data) return;
@@ -74,23 +82,33 @@ export default function SettingsPage({ params }: PageProps) {
       }
     }
 
+    // 0ms instant optimistic UI
+    const previous = data;
+    const updated = { ...data, autoDeleteEnabled: newStatus };
+    setData(updated);
+    settingsCache[username] = updated;
+
+    setSuccessMsg(
+      newStatus
+        ? "Hapus otomatis aktif: Seluruh file Anda akan dihapus dalam 48 jam dari sekarang."
+        : "Hapus otomatis dimatikan."
+    );
+    setTimeout(() => setSuccessMsg(null), 3000);
+
     try {
       const res = await fetch("/api/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ autoDeleteEnabled: newStatus }),
       });
-      if (res.ok) {
-        setData({ ...data, autoDeleteEnabled: newStatus });
-        setSuccessMsg(
-          newStatus
-            ? "Hapus otomatis aktif: Seluruh file Anda akan dihapus dalam 48 jam dari sekarang."
-            : "Hapus otomatis dimatikan."
-        );
-        setTimeout(() => setSuccessMsg(null), 3000);
+      if (!res.ok) {
+        setData(previous);
+        settingsCache[username] = previous;
       }
     } catch (err) {
       console.error(err);
+      setData(previous);
+      settingsCache[username] = previous;
     }
   };
 
@@ -186,6 +204,7 @@ export default function SettingsPage({ params }: PageProps) {
         {/* Back Link */}
         <Link
           href={`/${username}`}
+          prefetch={true}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition mb-6"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -202,9 +221,22 @@ export default function SettingsPage({ params }: PageProps) {
           </div>
         )}
 
-        {loading ? (
-          <div className="flex items-center justify-center p-12 text-slate-400">
-            <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
+        {loading && !data ? (
+          <div className="flex flex-col gap-6 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-6 rounded-3xl bg-white border border-slate-200/60 shadow-sm flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-40 bg-slate-100 rounded" />
+                      <div className="h-3 w-64 bg-slate-100 rounded" />
+                    </div>
+                  </div>
+                  <div className="h-8 w-24 bg-slate-100 rounded-xl" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="flex flex-col gap-6">

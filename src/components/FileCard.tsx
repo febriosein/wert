@@ -37,11 +37,11 @@ interface FileCardProps {
   onPreview: (file: FileItem) => void;
   onDelete: (id: string) => void;
   onRefresh: () => void;
+  onOptimisticUpdate?: (id: string, partial: Partial<FileItem>) => void;
 }
 
-export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps) {
+export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpdate }: FileCardProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const [updating, setUpdating] = useState(false);
   const [showReplaceModal, setShowReplaceModal] = useState(false);
 
   const countdown = formatCountdown(file.expires_at);
@@ -70,32 +70,34 @@ export function FileCard({ file, onPreview, onDelete, onRefresh }: FileCardProps
   };
 
   const handleExtend = async () => {
-    setUpdating(true);
     setShowMenu(false);
+    const newExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    // 0ms instant optimistic update
+    onOptimisticUpdate?.(file.id, { expires_at: newExpiresAt });
     try {
       await fetch(`/api/files/${file.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "extend" }),
       });
+    } catch {
       onRefresh();
-    } finally {
-      setUpdating(false);
     }
   };
 
   const handleToggleAutoDelete = async () => {
-    setUpdating(true);
     setShowMenu(false);
+    const newExpiresAt = file.expires_at ? null : new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    // 0ms instant optimistic update
+    onOptimisticUpdate?.(file.id, { expires_at: newExpiresAt });
     try {
       await fetch(`/api/files/${file.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle_auto_delete" }),
       });
+    } catch {
       onRefresh();
-    } finally {
-      setUpdating(false);
     }
   };
 

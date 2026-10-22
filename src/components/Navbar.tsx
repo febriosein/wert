@@ -32,7 +32,7 @@ export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) 
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
-        <Link href={username ? `/${username}` : "/"} className="flex items-center gap-2 group">
+        <Link href={username ? `/${username}` : "/"} prefetch={true} className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-emerald-700 transition">
             <Printer className="w-5 h-5" />
           </div>
@@ -65,6 +65,7 @@ export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) 
 
             <Link
               href={`/${username}/settings`}
+              prefetch={true}
               className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
               title="Pengaturan akun & PIN"
             >
