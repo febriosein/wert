@@ -1,26 +1,59 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #10241B;
+  --color-muted: #587063;
+  --color-bg: #F4FBF7;
+  --color-surface: #FFFFFF;
+  --color-line: #D5EADF;
+  --color-mint: #E3F8EC;
+  --color-brand: #19C37D;
+  --color-brand-deep: #087443;
+  --color-hl: #FFE45C;
+  --color-hl-soft: #FFF4B8;
+  --color-danger: #D92D3A;
+  --color-danger-soft: #FFEAEC;
+
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --ink: #10241B;
+  --muted: #587063;
+  --bg: #F4FBF7;
+  --surface: #FFFFFF;
+  --line: #D5EADF;
+  --mint: #E3F8EC;
+  --brand: #19C37D;
+  --brand-deep: #087443;
+  --hl: #FFE45C;
+  --hl-soft: #FFF4B8;
+  --danger: #D92D3A;
+  --danger-soft: #FFEAEC;
+  --shadow-soft: 0 1px 2px rgba(8, 116, 67, 0.06), 0 8px 24px rgba(8, 116, 67, 0.08);
+  --shadow-sticker: 4px 4px 0 #10241B;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+}
+
+/* Custom Sticker Shadows from design.md */
+.shadow-sticker {
+  box-shadow: 4px 4px 0 #10241B;
+}
+
+.shadow-sticker-sm {
+  box-shadow: 2px 2px 0 #10241B;
+}
+
+.shadow-sticker-lg {
+  box-shadow: 6px 6px 0 #10241B;
+}
+
+.font-display {
+  font-family: var(--font-bricolage), system-ui, sans-serif;
 }

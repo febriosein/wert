@@ -273,10 +273,10 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
+        className={`relative border-2 border-dashed rounded-[24px] p-8 sm:p-12 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
           isDragging
-            ? "border-emerald-500 bg-emerald-50/70 scale-[1.01]"
-            : "border-slate-300 hover:border-emerald-400 bg-slate-50/60 hover:bg-slate-50"
+            ? "border-brand-deep bg-mint/90 scale-[1.01]"
+            : "border-line hover:border-brand-deep/50 bg-surface hover:bg-mint/20 shadow-soft"
         }`}
       >
         <input
@@ -296,28 +296,28 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
           className="hidden"
         />
 
-        <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 mb-1 shadow-sm">
+        <div className="w-16 h-16 rounded-2xl bg-mint flex items-center justify-center text-brand-deep mb-1 border border-line shadow-sm">
           <UploadCloud className="w-8 h-8" />
         </div>
 
         <div>
-          <h3 className="font-bold text-slate-900 text-lg sm:text-xl">
+          <h3 className="font-display font-bold text-ink text-lg sm:text-xl">
             {replaceFileId ? "Pilih file pengganti" : "Tarik file tugas ke sini atau klik untuk memilih"}
           </h3>
-          <p className="text-slate-500 text-xs sm:text-sm mt-1">
+          <p className="text-muted text-xs sm:text-sm mt-1">
             Word (.docx), PDF (.pdf), Excel (.xlsx), PPTX, Foto (JPG, PNG, HEIC), ZIP (Maks. 50 MB)
           </p>
         </div>
 
         {/* Buttons for touch / mobile */}
         <div
-          className="flex flex-wrap items-center justify-center gap-2 mt-2"
+          className="flex flex-wrap items-center justify-center gap-2.5 mt-2"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition"
+            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-display font-bold bg-brand-deep hover:bg-[#065b34] text-white shadow-sm transition cursor-pointer"
           >
             Pilih File
           </button>
@@ -325,9 +325,9 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-sm transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-surface hover:bg-mint text-ink border border-line shadow-sm transition cursor-pointer"
           >
-            <Camera className="w-4 h-4 text-emerald-600" />
+            <Camera className="w-4 h-4 text-brand-deep" />
             <span>Ambil Foto</span>
           </button>
         </div>

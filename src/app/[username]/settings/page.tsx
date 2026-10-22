@@ -4,9 +4,7 @@ import { use, useState, useEffect, FormEvent } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import {
-  Shield,
   Clock,
-  HardDrive,
   Trash2,
   Lock,
   Unlock,
@@ -15,6 +13,10 @@ import {
   Copy,
   ChevronLeft,
   RefreshCw,
+  Cloud,
+  FileText,
+  HardDrive,
+  X,
 } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import Link from "next/link";
@@ -23,7 +25,6 @@ interface PageProps {
   params: Promise<{ username: string }>;
 }
 
-// Global in-memory cache to ensure 0ms instantaneous navigation
 const settingsCache: Record<string, any> = {};
 
 export default function SettingsPage({ params }: PageProps) {
@@ -37,7 +38,7 @@ export default function SettingsPage({ params }: PageProps) {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // PIN management modals/forms
+  // PIN management
   const [pinMode, setPinMode] = useState<"idle" | "set" | "change" | "remove">("idle");
   const [pinInput, setPinInput] = useState("");
   const [oldPinInput, setOldPinInput] = useState("");
@@ -90,8 +91,8 @@ export default function SettingsPage({ params }: PageProps) {
 
     setSuccessMsg(
       newStatus
-        ? "Hapus otomatis aktif: Seluruh file Anda akan dihapus dalam 48 jam dari sekarang."
-        : "Hapus otomatis dimatikan."
+        ? "Pengaturan disimpan: Hapus otomatis 48 jam aktif."
+        : "Pengaturan disimpan: Hapus otomatis dimatikan."
     );
     setTimeout(() => setSuccessMsg(null), 3000);
 
@@ -144,7 +145,7 @@ export default function SettingsPage({ params }: PageProps) {
         setTimeout(() => setSuccessMsg(null), 3000);
       }
 
-      loadSettings();
+      loadSettings(true);
     } catch (err: any) {
       setError(err.message);
     }
@@ -163,7 +164,7 @@ export default function SettingsPage({ params }: PageProps) {
       const json = await res.json();
       if (res.ok) {
         setSuccessMsg("Semua file berhasil dihapus.");
-        loadSettings();
+        loadSettings(true);
       } else {
         alert(json.error || "Gagal menghapus file");
       }
@@ -196,89 +197,102 @@ export default function SettingsPage({ params }: PageProps) {
     }
   };
 
+  const fileCountPercent = Math.min(100, Math.round(((data?.filesCount || 0) / (data?.maxFiles || 20)) * 100));
+  const storagePercent = Math.min(100, Math.round(((data?.totalSizeBytes || 0) / (data?.maxSizeBytes || 200 * 1024 * 1024)) * 100));
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className="min-h-screen flex flex-col bg-bg text-ink selection:bg-mint selection:text-brand-deep">
       <Navbar username={username} showActions={false} />
 
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-8">
+      <main className="flex-1 max-w-[720px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 text-left">
         {/* Back Link */}
         <Link
           href={`/${username}`}
           prefetch={true}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition mb-6"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-muted hover:text-ink transition mb-4"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Kembali ke File Tugas</span>
+          <span>File tugas</span>
         </Link>
 
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Pengaturan Akun</h1>
-        <p className="text-xs text-slate-500 mb-6">Kelola keamanan PIN, preferensi hapus otomatis, dan kuota penyimpanan Anda.</p>
+        {/* Heading & Subtitle */}
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-ink tracking-tight mb-1">
+          Pengaturan akun
+        </h1>
+        <p className="text-sm text-muted mb-8">
+          Atur PIN, penghapusan otomatis, dan ruang penyimpanan.
+        </p>
 
+        {/* Toast / Alert Message */}
         {successMsg && (
-          <div className="p-3 mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2">
-            <Check className="w-4 h-4" />
+          <div className="p-3.5 mb-6 rounded-2xl bg-mint border border-line text-brand-deep text-xs font-bold flex items-center gap-2 shadow-sm animate-in fade-in">
+            <Check className="w-4 h-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
 
         {loading && !data ? (
-          <div className="flex flex-col gap-6 animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-6 rounded-3xl bg-white border border-slate-200/60 shadow-sm flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-slate-100" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-40 bg-slate-100 rounded" />
-                      <div className="h-3 w-64 bg-slate-100 rounded" />
-                    </div>
-                  </div>
-                  <div className="h-8 w-24 bg-slate-100 rounded-xl" />
-                </div>
+          <div className="flex flex-col gap-5 animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-6 rounded-[20px] bg-surface border border-line shadow-soft flex flex-col gap-4">
+                <div className="h-6 w-48 bg-line rounded-lg" />
+                <div className="h-4 w-72 bg-line/60 rounded-md" />
               </div>
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {/* 1. PIN SECTION */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${data?.hasPin ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
-                    {data?.hasPin ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+            {/* 1. KEAMANAN PIN */}
+            <section className="bg-surface rounded-[20px] p-6 border border-line shadow-soft flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-mint text-brand-deep flex items-center justify-center shrink-0 border border-line shadow-sm">
+                    {data?.hasPin ? <Lock className="w-6 h-6" /> : <Unlock className="w-6 h-6" />}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-base">Keamanan PIN 4 Digit</h3>
-                    <p className="text-xs text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-display font-bold text-lg text-ink">PIN 4 digit</h2>
+                      {data?.hasPin ? (
+                        <span className="text-xs font-bold bg-mint text-brand-deep px-2.5 py-0.5 rounded-full border border-line">
+                          Aktif
+                        </span>
+                      ) : (
+                        <span className="text-xs font-bold bg-hl-soft text-ink px-2.5 py-0.5 rounded-full border border-hl">
+                          Belum diatur
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted mt-1 max-w-sm">
                       {data?.hasPin
-                        ? "Halaman ini dilindungi PIN. Hanya orang yang tahu PIN yang dapat membukanya."
-                        : "Belum ada PIN. Siapa pun yang tahu username dapat melihat dan mencetak file Anda."}
+                        ? "Hanya yang tahu PIN yang bisa membuka dan melihat file di halamanmu."
+                        : "Halamanmu saat ini dapat dibuka langsung oleh siapa pun tanpa PIN."}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0">
                   {!data?.hasPin ? (
                     <button
                       type="button"
                       onClick={() => setPinMode("set")}
-                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition"
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-brand-deep hover:bg-[#065b34] text-white shadow-sm transition cursor-pointer"
                     >
-                      Pasang PIN
+                      Buat PIN
                     </button>
                   ) : (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => setPinMode("change")}
-                        className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-bg hover:bg-mint border border-line text-ink transition cursor-pointer"
                       >
                         Ubah PIN
                       </button>
                       <button
                         type="button"
                         onClick={() => setPinMode("remove")}
-                        className="px-3 py-1.5 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 transition"
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold text-danger hover:bg-danger-soft transition cursor-pointer"
                       >
                         Hapus PIN
                       </button>
@@ -289,10 +303,10 @@ export default function SettingsPage({ params }: PageProps) {
 
               {/* PIN Forms */}
               {pinMode !== "idle" && !newRecoveryCode && (
-                <form onSubmit={handlePinSubmit} className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-3">
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                <form onSubmit={handlePinSubmit} className="mt-2 pt-4 border-t border-line flex flex-col gap-3">
+                  <h3 className="font-display text-xs font-bold text-ink uppercase tracking-wider">
                     {pinMode === "set" ? "Pasang PIN Baru" : pinMode === "change" ? "Ganti PIN" : "Hapus PIN"}
-                  </h4>
+                  </h3>
 
                   {pinMode === "change" && (
                     <input
@@ -303,7 +317,7 @@ export default function SettingsPage({ params }: PageProps) {
                       placeholder="PIN Lama (4 Digit)"
                       value={oldPinInput}
                       onChange={(e) => setOldPinInput(e.target.value.replace(/\D/g, ""))}
-                      className="w-full sm:w-64 py-2 px-3 rounded-xl border border-slate-300 text-sm"
+                      className="w-full sm:w-64 py-2.5 px-3 rounded-xl border border-line bg-bg text-sm font-display text-center tracking-widest outline-none focus:border-brand-deep"
                     />
                   )}
 
@@ -313,10 +327,10 @@ export default function SettingsPage({ params }: PageProps) {
                       inputMode="numeric"
                       maxLength={4}
                       required
-                      placeholder="Masukkan PIN Saat Ini (4 Digit)"
+                      placeholder="PIN Saat Ini (4 Digit)"
                       value={pinInput}
                       onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
-                      className="w-full sm:w-64 py-2 px-3 rounded-xl border border-slate-300 text-sm"
+                      className="w-full sm:w-64 py-2.5 px-3 rounded-xl border border-line bg-bg text-sm font-display text-center tracking-widest outline-none focus:border-brand-deep"
                     />
                   ) : (
                     <input
@@ -324,25 +338,25 @@ export default function SettingsPage({ params }: PageProps) {
                       inputMode="numeric"
                       maxLength={4}
                       required
-                      placeholder="PIN 4 Digit (0-9)"
+                      placeholder="PIN Baru 4 Digit"
                       value={pinMode === "change" ? newPinInput : pinInput}
                       onChange={(e) =>
                         pinMode === "change"
                           ? setNewPinInput(e.target.value.replace(/\D/g, ""))
                           : setPinInput(e.target.value.replace(/\D/g, ""))
                       }
-                      className="w-full sm:w-64 py-2 px-3 rounded-xl border border-slate-300 text-sm font-bold tracking-widest text-center"
+                      className="w-full sm:w-64 py-2.5 px-3 rounded-xl border border-line bg-bg text-sm font-display text-center tracking-widest outline-none focus:border-brand-deep"
                     />
                   )}
 
-                  {error && <span className="text-xs text-rose-600">{error}</span>}
+                  {error && <span className="text-xs text-danger font-medium">{error}</span>}
 
                   <div className="flex items-center gap-2 mt-1">
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition"
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-brand-deep hover:bg-[#065b34] text-white transition cursor-pointer shadow-sm"
                     >
-                      Simpan
+                      Simpan PIN
                     </button>
                     <button
                       type="button"
@@ -350,7 +364,7 @@ export default function SettingsPage({ params }: PageProps) {
                         setPinMode("idle");
                         setError(null);
                       }}
-                      className="px-3 py-2 rounded-xl text-xs text-slate-500 hover:bg-slate-100 transition"
+                      className="px-3 py-2 rounded-xl text-xs font-medium text-muted hover:text-ink transition cursor-pointer"
                     >
                       Batal
                     </button>
@@ -360,10 +374,10 @@ export default function SettingsPage({ params }: PageProps) {
 
               {/* Recovery Code Display */}
               {newRecoveryCode && (
-                <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-3">
-                  <span className="text-xs font-bold text-amber-900">Simpan Kode Pemulihan Anda:</span>
-                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
-                    <span className="font-mono font-bold text-base text-amber-900 tracking-wider">
+                <div className="mt-2 pt-4 border-t border-line flex flex-col gap-3">
+                  <span className="text-xs font-bold text-ink">Simpan Kode Pemulihan Anda:</span>
+                  <div className="p-3.5 rounded-2xl bg-hl-soft border border-hl flex items-center justify-between">
+                    <span className="font-mono font-bold text-base text-ink tracking-wider">
                       {newRecoveryCode}
                     </span>
                     <button
@@ -373,9 +387,10 @@ export default function SettingsPage({ params }: PageProps) {
                         setCopiedCode(true);
                         setTimeout(() => setCopiedCode(false), 2000);
                       }}
-                      className="p-1.5 rounded-lg bg-white border border-amber-300 text-amber-800"
+                      className="p-1.5 rounded-lg bg-surface border border-line text-ink hover:bg-mint"
+                      title="Salin kode"
                     >
-                      {copiedCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                      {copiedCode ? <Check className="w-4 h-4 text-brand-deep" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
                   <button
@@ -384,128 +399,192 @@ export default function SettingsPage({ params }: PageProps) {
                       setNewRecoveryCode(null);
                       setPinMode("idle");
                     }}
-                    className="self-start px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-white"
+                    className="self-start px-4 py-2 rounded-xl text-xs font-bold bg-brand-deep text-white cursor-pointer"
                   >
                     Selesai
                   </button>
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* 2. AUTO-DELETE SECTION */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
+            {/* 2. PRIVASI (HAPUS OTOMATIS) */}
+            <section className="bg-surface rounded-[20px] p-6 border border-line shadow-soft flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-hl-soft text-ink flex items-center justify-center shrink-0 border border-hl shadow-sm">
+                    <Clock className="w-6 h-6 text-brand-deep" />
+                  </div>
+                  <div>
+                    <h2 className="font-display font-bold text-lg text-ink">
+                      Hapus otomatis setelah 48 jam
+                    </h2>
+                    <p className="text-xs text-muted mt-1 max-w-md">
+                      File baru akan dihapus otomatis setelah 48 jam. Bisa diubah per file saat diunggah.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">Hapus Otomatis Default (48 Jam)</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Jika aktif, file tugas baru yang diunggah akan otomatis terhapus setelah 48 jam untuk menjaga privasi.
-                  </p>
-                </div>
-              </div>
 
-              <button
-                type="button"
-                onClick={handleToggleAutoDelete}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  data?.autoDeleteEnabled ? "bg-emerald-600" : "bg-slate-300"
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    data?.autoDeleteEnabled ? "translate-x-5" : "translate-x-0"
+                {/* Big Custom Toggle Switch (52px x 32px) from design.md */}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={data?.autoDeleteEnabled}
+                  onClick={handleToggleAutoDelete}
+                  className={`relative w-[52px] h-[32px] rounded-full p-1 transition-colors duration-200 focus:outline-none flex items-center shrink-0 cursor-pointer ${
+                    data?.autoDeleteEnabled ? "bg-brand-deep" : "bg-line"
                   }`}
-                />
-              </button>
-            </div>
-
-            {/* 3. STORAGE QUOTA SECTION */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <HardDrive className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">Kuota Penyimpanan</h3>
-                  <p className="text-xs text-slate-500">Batas kapasitas file dan memori untuk akun Anda.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col">
-                  <span className="text-[11px] text-slate-500 font-medium">Jumlah File</span>
-                  <span className="text-lg font-bold text-slate-900">
-                    {data?.filesCount} <span className="text-xs text-slate-400 font-normal">/ {data?.maxFiles} file</span>
+                >
+                  <span
+                    className={`w-6 h-6 rounded-full bg-surface shadow-sm transform transition-transform duration-200 flex items-center justify-center ${
+                      data?.autoDeleteEnabled ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${data?.autoDeleteEnabled ? "bg-brand-deep" : "bg-muted"}`} />
                   </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col">
-                  <span className="text-[11px] text-slate-500 font-medium">Ruang Terpakai</span>
-                  <span className="text-lg font-bold text-slate-900">
-                    {formatBytes(data?.totalSizeBytes || 0)}{" "}
-                    <span className="text-xs text-slate-400 font-normal">/ {formatBytes(data?.maxSizeBytes || 0)}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. DANGER ZONE */}
-            <div className="p-6 rounded-2xl bg-rose-50/50 border border-rose-200 shadow-sm flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-rose-800">
-                <AlertTriangle className="w-5 h-5" />
-                <h3 className="font-bold text-sm sm:text-base">Zona Bahaya</h3>
+                </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+              {/* Retention Micro Indicator */}
+              <div className="flex items-center gap-2 mt-1 px-3.5 py-2.5 rounded-xl bg-bg border border-line text-xs text-muted">
+                <Clock className="w-4 h-4 text-brand-deep shrink-0" />
+                <span>Berkas yang tersisa saat ini mematuhi jadwal kedaluwarsa aktif.</span>
+              </div>
+            </section>
+
+            {/* 3. PENYIMPANAN & KUOTA */}
+            <section className="bg-surface rounded-[20px] p-6 border border-line shadow-soft flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E4EEFF] text-[#1D4ED8] flex items-center justify-center shrink-0">
+                    <Cloud className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="font-display font-bold text-lg text-ink">
+                      Kapasitas & Kuota Penyimpanan
+                    </h2>
+                    <p className="text-xs text-muted mt-0.5">Batas aman dokumen yang disimpan di server.</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold bg-mint text-brand-deep px-3 py-1 rounded-full border border-line">
+                  Optimal
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-3 pt-2">
+                {/* Row 1: File Count */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-bg rounded-xl border border-line">
+                  <div className="flex items-center gap-2 text-xs font-medium text-ink">
+                    <FileText className="w-4 h-4 text-muted" />
+                    <span>Jumlah file</span>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-5">
+                    <span className="font-display font-bold text-base text-ink">
+                      {data?.filesCount || 0} <span className="text-xs text-muted font-normal">dari {data?.maxFiles || 20}</span>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-28 sm:w-36 h-2 rounded-full bg-line overflow-hidden">
+                        <div className="h-full bg-brand rounded-full transition-all" style={{ width: `${fileCountPercent}%` }} />
+                      </div>
+                      <span className="text-xs font-semibold text-muted w-8 text-right">{fileCountPercent}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Storage Size */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-bg rounded-xl border border-line">
+                  <div className="flex items-center gap-2 text-xs font-medium text-ink">
+                    <HardDrive className="w-4 h-4 text-muted" />
+                    <span>Ruang terpakai</span>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-5">
+                    <span className="font-display font-bold text-base text-ink">
+                      {formatBytes(data?.totalSizeBytes || 0)} <span className="text-xs text-muted font-normal">dari {formatBytes(data?.maxSizeBytes || 200 * 1024 * 1024)}</span>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-28 sm:w-36 h-2 rounded-full bg-line overflow-hidden">
+                        <div
+                          className="h-full bg-brand rounded-full transition-all"
+                          style={{ width: `${Math.max(2, storagePercent)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold text-muted w-8 text-right">{storagePercent}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 4. ZONA BAHAYA (WHITE CARD, SUBTLE RED BORDER) */}
+            <section className="bg-surface rounded-[20px] p-6 border border-danger/30 shadow-soft flex flex-col gap-4">
+              <div className="flex items-center gap-2.5 text-danger">
+                <div className="w-8 h-8 rounded-lg bg-danger-soft flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-danger" />
+                </div>
+                <h3 className="font-display font-bold text-lg text-danger">
+                  Zona Bahaya
+                </h3>
+              </div>
+
+              {/* Action 1: Hapus Semua File */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                 <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-800">Hapus Semua File</h4>
-                  <p className="text-[11px] text-slate-500">Menghapus seluruh file tugas yang ada di akun ini sekaligus.</p>
+                  <h4 className="font-display font-bold text-sm text-ink">Hapus semua file</h4>
+                  <p className="text-xs text-muted mt-0.5">
+                    Menghapus seluruh file tugas di halaman ini sekaligus tanpa bisa dipulihkan.
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleDeleteAllFiles}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-rose-50 text-rose-700 border border-rose-300 transition"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-surface hover:bg-danger-soft text-danger border border-danger/40 transition shrink-0 cursor-pointer"
                 >
-                  Hapus Semua File
+                  Hapus semua file
                 </button>
               </div>
 
-              <div className="h-px bg-rose-200/60 my-1" />
+              <div className="h-px bg-line my-1" />
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              {/* Action 2: Hapus Akun Permanen */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-800">Hapus Akun Permanen</h4>
-                  <p className="text-[11px] text-slate-500">Menghapus akun @{username} beserta semua file dan PIN.</p>
+                  <h4 className="font-display font-bold text-sm text-ink">Hapus akun permanen</h4>
+                  <p className="text-xs text-muted mt-0.5">
+                    Menghapus halaman @{username} beserta semua file dan PIN.
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowDeleteAccountModal(true)}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition shadow-sm"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-danger hover:bg-red-700 text-white transition shrink-0 cursor-pointer shadow-sm"
                 >
                   Hapus Akun
                 </button>
               </div>
-            </div>
+            </section>
+
+            {/* Auto-Save Footer Note */}
+            <footer className="flex items-center justify-center gap-2 pt-2 text-muted text-xs">
+              <RefreshCw className="w-3.5 h-3.5 text-brand-deep" />
+              <span>Perubahan pengaturan disimpan otomatis.</span>
+            </footer>
           </div>
         )}
       </main>
 
-      {/* Delete Account Confirmation Modal */}
+      {/* Delete Account Modal */}
       {showDeleteAccountModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl flex flex-col gap-4 text-center">
-            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-sm rounded-[28px] bg-surface p-6 shadow-2xl border border-line flex flex-col gap-4 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-danger-soft text-danger flex items-center justify-center mx-auto border border-danger/20">
               <Trash2 className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Konfirmasi Hapus Akun</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="font-display font-bold text-lg text-ink">Konfirmasi Hapus Akun</h3>
+            <p className="text-xs text-muted leading-relaxed">
               Apakah Anda yakin ingin menghapus akun @{username}? Username akan bebas dipakai lagi oleh orang lain dan semua file Anda hilang permanen.
             </p>
 
             <div className="flex flex-col gap-1 text-left">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-ink">
                 Ketik username Anda (<b>{username}</b>) untuk konfirmasi:
               </label>
               <input
@@ -514,22 +593,22 @@ export default function SettingsPage({ params }: PageProps) {
                 placeholder={username}
                 value={deleteAccountUsername}
                 onChange={(e) => setDeleteAccountUsername(e.target.value.toLowerCase())}
-                className="w-full py-2 px-3 rounded-xl border border-slate-300 text-sm font-semibold"
+                className="w-full py-2.5 px-3 rounded-xl border border-line text-sm font-semibold bg-bg focus:border-brand-deep outline-none"
               />
             </div>
 
             {data?.hasPin && (
               <div className="flex flex-col gap-1 text-left">
-                <label className="text-xs font-semibold text-slate-700">Masukkan PIN 4 Digit</label>
+                <label className="text-xs font-semibold text-ink">Masukkan PIN 4 Digit</label>
                 <input
                   type="password"
                   inputMode="numeric"
                   maxLength={4}
                   required
-                  placeholder="PIN 4 Digit"
+                  placeholder="••••"
                   value={deleteAccountPin}
                   onChange={(e) => setDeleteAccountPin(e.target.value.replace(/\D/g, ""))}
-                  className="w-full py-2 px-3 rounded-xl border border-slate-300 text-sm tracking-widest text-center font-bold"
+                  className="w-full py-2.5 px-3 rounded-xl border border-line text-sm tracking-widest text-center font-bold bg-bg focus:border-brand-deep outline-none"
                 />
               </div>
             )}
@@ -539,7 +618,7 @@ export default function SettingsPage({ params }: PageProps) {
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={deleteAccountUsername !== username || (data?.hasPin && deleteAccountPin.length !== 4)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white transition shadow-sm"
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-danger hover:bg-red-700 disabled:opacity-50 text-white transition shadow-sm cursor-pointer"
               >
                 Hapus Permanen
               </button>
@@ -550,7 +629,7 @@ export default function SettingsPage({ params }: PageProps) {
                   setDeleteAccountUsername("");
                   setDeleteAccountPin("");
                 }}
-                className="flex-1 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition"
+                className="flex-1 py-2.5 rounded-xl text-xs font-medium text-muted hover:bg-mint transition cursor-pointer"
               >
                 Batal
               </button>

@@ -29,58 +29,68 @@ export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) 
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full border-b border-line bg-surface/85 backdrop-blur-md">
+      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
-        <Link href={username ? `/${username}` : "/"} prefetch={true} className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-emerald-700 transition">
+        <Link href={username ? `/${username}` : "/"} prefetch={true} className="flex items-center gap-3 group">
+          {/* Logo Kotak Hijau 40x40 bergaya stiker */}
+          <div className="w-10 h-10 rounded-xl bg-brand-deep flex items-center justify-center text-white border-2 border-ink shadow-sticker-sm flex-shrink-0 transition-transform group-hover:-translate-y-0.5">
             <Printer className="w-5 h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-xl tracking-tight text-slate-900 leading-none">
-              wert<span className="text-emerald-600">.web.id</span>
+          <div className="flex flex-col leading-none">
+            <div className="flex items-center gap-1.5">
+              <span className="font-display font-extrabold text-[22px] tracking-tight text-ink">
+                wert<span className="text-brand-deep">.web.id</span>
+              </span>
+            </div>
+            <span className="hidden sm:inline text-xs font-medium text-muted mt-0.5">
+              Cetak tugas tanpa WhatsApp
             </span>
-            <span className="text-[10px] text-slate-500 font-medium">Cetak tugas tanpa WhatsApp</span>
           </div>
         </Link>
 
         {/* User Context & Actions */}
         {username && showActions && (
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+            {/* Chip @nama */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mint text-brand-deep border border-line">
+              <span className="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
               @{username}
             </span>
 
+            {/* Tombol Upload dari HP */}
             {onOpenQr && (
               <button
                 type="button"
                 onClick={onOpenQr}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] text-xs font-bold bg-surface border border-line text-ink hover:bg-mint hover:border-brand-deep/30 shadow-sm transition-all cursor-pointer"
                 title="Buka QR Code untuk upload dari smartphone"
               >
-                <QrCode className="w-4 h-4 text-emerald-600" />
+                <QrCode className="w-4 h-4 text-brand-deep" />
                 <span className="hidden md:inline">Upload dari HP</span>
               </button>
             )}
 
+            {/* Ikon Pengaturan */}
             <Link
               href={`/${username}/settings`}
               prefetch={true}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:text-ink hover:bg-mint transition"
               title="Pengaturan akun & PIN"
             >
               <Settings className="w-4 h-4" />
             </Link>
 
+            {/* Tombol Keluar */}
             <button
               type="button"
               onClick={handleLogout}
               disabled={loggingOut}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-600 hover:bg-rose-50 border border-rose-200 transition"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-danger hover:bg-danger-soft transition"
               title="Keluar dari sesi ini"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Keluar</span>
+              <span className="hidden sm:inline">Keluar</span>
             </button>
           </div>
         )}

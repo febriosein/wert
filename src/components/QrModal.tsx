@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, RefreshCw, Smartphone, Copy, Check, ExternalLink } from "lucide-react";
+import { X, RefreshCw, Smartphone, Copy, Check, Camera, Image, ArrowRight } from "lucide-react";
 
 export interface CachedQrSession {
   qrDataUrl: string;
@@ -39,7 +39,6 @@ export function QrModal({ isOpen, onClose, username }: QrModalProps) {
   const [copied, setCopied] = useState(false);
 
   const fetchQrToken = useCallback(async (forceRefresh = false) => {
-    // If not forcing refresh and active cache exists, use it instantly (0ms)
     const validCache = getCachedQrSession();
     if (!forceRefresh && validCache) {
       setQrDataUrl(validCache.qrDataUrl);
@@ -117,88 +116,125 @@ export function QrModal({ isOpen, onClose, username }: QrModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-100">
-      <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl flex flex-col items-center text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="relative w-full max-w-xl rounded-[28px] bg-surface p-6 sm:p-8 shadow-2xl border border-line flex flex-col text-left">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+          className="absolute top-5 right-5 p-2 rounded-xl text-muted hover:text-ink hover:bg-mint transition cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 shadow-sm">
-          <Smartphone className="w-6 h-6" />
-        </div>
-
-        <h3 className="text-lg font-bold text-slate-900">Upload dari Smartphone</h3>
-        <p className="text-xs text-slate-500 mt-1 mb-4">
-          Scan dengan kamera HP untuk mengunggah file langsung ke akun @{username} tanpa login.
-        </p>
-
-        {/* QR Code Container */}
-        <div className="relative w-64 h-64 border-2 border-slate-100 rounded-2xl p-2 bg-white flex items-center justify-center shadow-inner overflow-hidden">
-          {loading && !qrDataUrl ? (
-            <div className="w-full h-full rounded-xl bg-slate-100 animate-pulse flex flex-col items-center justify-center gap-2 text-slate-400">
-              <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-              <span className="text-xs font-medium">Menyiapkan QR Code...</span>
-            </div>
-          ) : qrDataUrl ? (
-            <img
-              src={qrDataUrl}
-              alt="Scan QR untuk upload dari smartphone"
-              className="w-full h-full object-contain rounded-xl"
-            />
-          ) : (
-            <span className="text-xs text-rose-500 font-medium">Gagal memuat QR.</span>
-          )}
-        </div>
-
-        {/* Expiry info & actions */}
-        <div className="w-full flex items-center justify-between mt-4 text-xs text-slate-500">
-          <span>
-            {remainingMinutes > 0 ? (
-              <>Berlaku selama <b>{remainingMinutes} menit</b></>
-            ) : (
-              <span className="text-rose-500 font-semibold">QR Kedaluwarsa</span>
-            )}
-          </span>
-
-          <button
-            type="button"
-            onClick={() => fetchQrToken(true)}
-            disabled={loading}
-            className="inline-flex items-center gap-1 font-semibold text-emerald-600 hover:text-emerald-700 transition"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>Perbarui QR</span>
-          </button>
-        </div>
-
-        {/* Copy Link fallback */}
-        {targetUrl && (
-          <div className="w-full mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? "Link Tersalin!" : "Salin Link HP"}</span>
-            </button>
-
-            <a
-              href={targetUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
-              title="Buka tab baru untuk tes"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
+        {/* Header with Title & Badge */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-mint text-brand-deep flex items-center justify-center border border-line shadow-sm">
+            <Smartphone className="w-6 h-6" />
           </div>
-        )}
+          <div>
+            <h3 className="font-display font-extrabold text-xl sm:text-2xl text-ink">
+              Upload dari Smartphone
+            </h3>
+            <p className="text-xs text-muted mt-0.5">
+              Unggah langsung ke <b className="text-brand-deep">@{username}</b> tanpa login
+            </p>
+          </div>
+        </div>
+
+        {/* 2-Column Desktop Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+          {/* Left: Sticker QR Box */}
+          <div className="sm:col-span-5 flex flex-col items-center">
+            <div className="relative w-48 h-48 border-2 border-ink rounded-[20px] p-2 bg-surface flex items-center justify-center shadow-sticker overflow-hidden">
+              {loading && !qrDataUrl ? (
+                <div className="w-full h-full rounded-xl bg-bg animate-pulse flex flex-col items-center justify-center gap-2 text-muted">
+                  <RefreshCw className="w-6 h-6 animate-spin text-brand-deep" />
+                  <span className="text-xs font-medium">Menyiapkan QR...</span>
+                </div>
+              ) : qrDataUrl ? (
+                <img
+                  src={qrDataUrl}
+                  alt="Scan QR untuk upload dari smartphone"
+                  className="w-full h-full object-contain rounded-xl"
+                />
+              ) : (
+                <span className="text-xs text-danger font-medium">Gagal memuat QR.</span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between w-full mt-3 px-1 text-xs">
+              <span className={`font-semibold ${remainingMinutes <= 2 ? "text-danger" : "text-muted"}`}>
+                {remainingMinutes > 0 ? `Berlaku ${remainingMinutes} mnt` : "Kedaluwarsa"}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => fetchQrToken(true)}
+                disabled={loading}
+                className="inline-flex items-center gap-1 font-bold text-brand-deep hover:underline transition cursor-pointer"
+              >
+                <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
+                <span>Perbarui</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right: 3 Steps Guide & Link */}
+          <div className="sm:col-span-7 flex flex-col gap-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-2.5 rounded-xl bg-bg border border-line">
+                <div className="w-7 h-7 rounded-lg bg-mint text-brand-deep font-display font-bold text-xs flex items-center justify-center shrink-0">
+                  1
+                </div>
+                <div className="text-xs">
+                  <span className="font-bold text-ink">Buka kamera HP</span>
+                  <p className="text-muted mt-0.5">Buka aplikasi kamera standar atau pemindai QR bawaan HP.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-2.5 rounded-xl bg-bg border border-line">
+                <div className="w-7 h-7 rounded-lg bg-[#E4EEFF] text-[#1D4ED8] font-display font-bold text-xs flex items-center justify-center shrink-0">
+                  2
+                </div>
+                <div className="text-xs">
+                  <span className="font-bold text-ink">Arahkan ke kode QR</span>
+                  <p className="text-muted mt-0.5">Ketuk tautan notifikasi yang muncul di layar ponsel.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-2.5 rounded-xl bg-bg border border-line">
+                <div className="w-7 h-7 rounded-lg bg-hl-soft text-ink font-display font-bold text-xs flex items-center justify-center shrink-0">
+                  3
+                </div>
+                <div className="text-xs">
+                  <span className="font-bold text-ink">Pilih file atau foto</span>
+                  <p className="text-muted mt-0.5">File otomatis masuk ke layar komputer dalam sekejap.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Fallback Copy Link */}
+            {targetUrl && (
+              <div className="pt-2 border-t border-line flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={targetUrl}
+                  className="flex-1 bg-bg border border-line rounded-xl px-3 py-2 text-xs text-muted truncate select-all outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-deep hover:bg-[#065b34] text-white text-xs font-bold transition shadow-sm cursor-pointer shrink-0"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? "Tersalin!" : "Salin Link"}</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

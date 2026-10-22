@@ -44,20 +44,20 @@ export default function MobileUploadPage({ params }: PageProps) {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen flex flex-col bg-bg text-ink selection:bg-mint selection:text-brand-deep">
       {/* Mobile Header */}
-      <header className="p-4 border-b border-slate-200 bg-white shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-sm">
+      <header className="p-4 border-b border-line bg-surface/90 backdrop-blur-md flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-brand-deep flex items-center justify-center text-white font-bold border-2 border-ink shadow-sticker-sm">
             <Printer className="w-4 h-4" />
           </div>
-          <span className="font-extrabold text-lg tracking-tight text-slate-900">
-            wert<span className="text-emerald-600">.web.id</span>
+          <span className="font-display font-extrabold text-lg tracking-tight text-ink">
+            wert<span className="text-brand-deep">.web.id</span>
           </span>
         </div>
 
         {sessionData && (
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-mint text-brand-deep border border-line">
             @{sessionData.username}
           </span>
         )}
@@ -66,37 +66,37 @@ export default function MobileUploadPage({ params }: PageProps) {
       {/* Main Content */}
       <main className="flex-1 max-w-lg w-full mx-auto px-4 py-8 flex flex-col justify-center">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
-            <RefreshCw className="w-8 h-8 animate-spin text-emerald-600" />
+          <div className="flex flex-col items-center justify-center p-12 text-muted gap-3">
+            <RefreshCw className="w-8 h-8 animate-spin text-brand-deep" />
             <span className="text-sm font-medium">Menghubungkan ke sesi komputer...</span>
           </div>
         ) : error ? (
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xl text-center flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+          <div className="p-6 rounded-[28px] bg-surface border border-line shadow-soft text-center flex flex-col items-center">
+            <div className="w-12 h-12 rounded-2xl bg-danger-soft text-danger flex items-center justify-center mb-3 border border-danger/20">
               <AlertCircle className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Sesi QR Tidak Aktif</h2>
-            <p className="text-xs text-slate-500 mt-2 mb-4 leading-relaxed">{error}</p>
-            <p className="text-[11px] text-slate-400">
+            <h2 className="font-display text-lg font-bold text-ink">Sesi QR Tidak Aktif</h2>
+            <p className="text-xs text-muted mt-2 mb-4 leading-relaxed">{error}</p>
+            <p className="text-[11px] text-muted">
               Buka kembali layar komputer fotokopian Anda dan scan kode QR terbaru.
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
             <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2">
+              <div className="w-12 h-12 rounded-2xl bg-mint text-brand-deep flex items-center justify-center mx-auto mb-2 border border-line shadow-sm">
                 <Smartphone className="w-6 h-6" />
               </div>
-              <h1 className="text-xl font-extrabold text-slate-900">
+              <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink">
                 Unggah File ke Komputer
               </h1>
-              <p className="text-xs text-slate-500 mt-1">
-                Tujuan: <b>wert.web.id/{sessionData?.username}</b>
+              <p className="text-xs text-muted mt-1">
+                Tujuan: <b className="text-brand-deep">wert.web.id/{sessionData?.username}</b>
               </p>
             </div>
 
             {/* Dropzone with camera & document file picking */}
-            <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-lg">
+            <div className="bg-surface p-4 rounded-[28px] border border-line shadow-soft">
               <Dropzone
                 token={token}
                 onUploadSuccess={() => {
@@ -106,13 +106,13 @@ export default function MobileUploadPage({ params }: PageProps) {
             </div>
 
             {/* Live Notification Indicator */}
-            <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-700">
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-mint border border-line text-ink">
+              <div className="w-8 h-8 rounded-xl bg-surface border border-line flex items-center justify-center shrink-0 text-brand-deep shadow-sm">
                 <Monitor className="w-4 h-4" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold">Sinkronisasi Realtime</span>
-                <span className="text-[11px] text-emerald-700">
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-brand-deep">Sinkronisasi Realtime</span>
+                <span className="text-[11px] text-muted mt-0.5">
                   File yang berhasil diunggah langsung muncul otomatis di layar komputer fotokopian.
                 </span>
               </div>
@@ -121,8 +121,8 @@ export default function MobileUploadPage({ params }: PageProps) {
         )}
       </main>
 
-      <footer className="py-4 text-center text-xs text-slate-400 border-t border-slate-200/50">
-        wert.web.id • Upload Cepat & Aman
+      <footer className="py-4 text-center text-xs text-muted border-t border-line">
+        wert.web.id • Cetak tugas tanpa WhatsApp
       </footer>
     </div>
   );

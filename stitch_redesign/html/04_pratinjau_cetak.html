@@ -1,0 +1,623 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Pratinjau &amp; Cetak Dokumen - wert.web.id</title>
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            times: ['"Times New Roman"', 'Times', 'serif']
+          },
+          boxShadow: {
+            'pdf': '0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+            'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- Google Font Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Custom Styles for Document Sheet and Viewer Canvas -->
+<style data-purpose="custom-scrollbars">
+    /* Custom refined scrollbars for the PDF canvas */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2b2f36;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #505663;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+  </style>
+<style data-purpose="animations">
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-subtle {
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+  </style>
+<meta content="web_standard" name="shell-type"></head>
+<body class="bg-[#1e2430] text-gray-800 font-sans min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-4 md:p-6">
+<!-- BEGIN: BlurredBackgroundDashboard -->
+<!-- Imitating the underlying wert.web.id dashboard page with blur effect -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none opacity-30 blur-md select-none overflow-hidden">
+<!-- Mock Header -->
+<header class="bg-white px-8 py-3.5 flex items-center justify-between border-b border-gray-200">
+<div class="flex items-center gap-2 text-emerald-600 font-bold text-xl">
+<svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+<path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"></path>
+</svg>
+<span class="">wert<span class="text-gray-900 font-normal">.web.id</span></span>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold">@perkoa</span>
+<button class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold">Upload dari HP</button>
+</div>
+</header>
+<!-- Mock Cards Grid -->
+<main class="max-w-7xl mx-auto px-8 py-8"><div class="flex flex-col w-full">
+<!-- Interactive Modal Wrapper simulating exact light-mode self-service print view -->
+<section class="relative w-full max-w-[1080px] mx-auto bg-surface-container-lowest rounded-3xl shadow-xl flex flex-col overflow-hidden transition-all duration-300">
+<!-- BEGIN: Header Modal -->
+<header class="bg-surface-container-lowest px-6 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-4 select-none">
+<!-- File Metadata (Left Side) -->
+<div class="flex items-center gap-4 min-w-0">
+<div class="w-11 h-11 rounded-2xl bg-error-container text-on-error-container flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div class="truncate">
+<div class="flex items-center gap-2">
+<h1 class="font-headline-sm text-headline-sm text-on-surface truncate tracking-tight" title="TEMPLATE_LAPRAK_PSM_-_Copy_6_.pdf">
+              TEMPLATE_LAPRAK_PSM_-_Copy_6_.pdf
+            </h1>
+<span class="bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+              A4 Sesuai
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-outline flex items-center gap-1.5 mt-0.5">
+<span class="font-semibold text-secondary">28 halaman</span>
+<span class="">•</span>
+<span class="">1,0 MB</span>
+<span class="">•</span>
+<span class="text-on-surface-variant">Diunggah 10 menit lalu</span>
+</p>
+</div>
+</div>
+<!-- Action Cluster (Right Side) -->
+<div class="flex items-center gap-2.5 sm:gap-3 ml-auto">
+<!-- Main Print Button -->
+<button class="inline-flex items-center gap-2 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-2.5 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 duration-150" id="modal-print-btn" type="button">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">print</span>
+<span class="">Cetak dokumen</span>
+</button>
+<!-- Secondary: New Tab -->
+<a class="hidden sm:inline-flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg px-4 py-2.5 rounded-2xl transition-colors" href="#tab-preview" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-base">open_in_new</span>
+<span class="">Tab baru</span>
+</a>
+<!-- Secondary: Download -->
+<button class="hidden sm:inline-flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg px-4 py-2.5 rounded-2xl transition-colors" type="button">
+<span class="material-symbols-outlined text-base">download</span>
+<span class="">Unduh</span>
+</button>
+<!-- Close Dialog -->
+<button aria-label="Tutup Dialog" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container-highest text-outline hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</header>
+<!-- END: Header Modal -->
+<!-- BEGIN: Area Pratinjau Dokumen -->
+<!-- Crisp Mint Backdrop (#E3F8EC) instead of murky browser grays -->
+<main class="relative h-[560px] bg-brand-50 overflow-y-auto px-4 py-8 flex justify-center items-start scroll-smooth" id="viewport-preview">
+<!-- A4 White Document Sheet with gentle emerald cast shadow -->
+<article class="bg-surface-container-lowest w-full max-w-[580px] min-h-[820px] p-8 sm:p-12 rounded-lg shadow-md my-2 transition-transform duration-200 select-text text-on-surface" id="pdf-sheet">
+<!-- Classic Academic Framed Border -->
+<div class="w-full h-full p-6 sm:p-8 flex flex-col justify-between items-center text-center bg-surface-container-lowest rounded">
+<!-- Document Header Titles -->
+<div class="space-y-2 pt-2">
+<p class="font-label-sm text-label-sm tracking-widest text-secondary font-bold uppercase">
+              Tugas Praktikum Mandiri
+            </p>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight uppercase leading-snug">
+              LAPORAN PRAKTIKUM KE-5<br>PROYEK SISTEM MULTIMEDIA
+            </h2>
+</div>
+<!-- Academic Vector Emblem -->
+<div class="my-8 flex justify-center items-center">
+<div class="relative w-36 h-36 flex items-center justify-center p-2 rounded-2xl bg-surface-container-low shadow-sm">
+<svg class="w-28 h-28" fill="none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<polygon fill="#006948" points="100,10 185,65 155,175 45,175 15,65"></polygon>
+<polygon fill="#6ffbbe" points="100,24 170,70 144,160 56,160 30,70"></polygon>
+<polygon fill="#005236" points="100,40 156,78 136,148 64,148 44,78"></polygon>
+<circle cx="100" cy="100" fill="#faf8ff" r="34"></circle>
+<circle cx="100" cy="100" fill="#008096" r="28"></circle>
+<polygon fill="#acedff" points="100,80 110,98 90,98"></polygon>
+<path d="M80 112 Q90 106 100 112 T120 112" stroke="#faf8ff" stroke-linecap="round" stroke-width="3"></path>
+<path d="M82 119 Q91 114 100 119 T118 119" stroke="#6ffbbe" stroke-linecap="round" stroke-width="2.5"></path>
+<text fill="#faf8ff" font-size="6.5" font-weight="800" letter-spacing="1" text-anchor="middle" x="100" y="74">UNIVERSITAS</text>
+<text fill="#faf8ff" font-size="6.5" font-weight="800" letter-spacing="1" text-anchor="middle" x="100" y="132">KAMPUS UTAMA</text>
+</svg>
+</div>
+</div>
+<!-- Structured Identification Block -->
+<div class="w-full max-w-md mx-auto text-left space-y-5 bg-surface-container-low/60 p-5 rounded-2xl">
+<div class="text-center font-label-md text-label-md text-secondary uppercase tracking-wider">
+              Disusun Oleh :
+            </div>
+<div class="grid grid-cols-[80px_12px_1fr] gap-y-1.5 font-body-sm text-body-sm">
+<span class="font-semibold text-outline">Nama</span>
+<span class="">:</span>
+<span class="font-medium text-on-surface">[Nama Mahasiswa]</span>
+<span class="font-semibold text-outline">NPM</span>
+<span class="">:</span>
+<span class="font-medium font-mono text-on-surface">G1A026042</span>
+<span class="font-semibold text-outline">Kelas</span>
+<span class="">:</span>
+<span class="font-medium text-on-surface">B1 (Multimedia &amp; Jaringan)</span>
+</div>
+<!-- Teaching Assistants -->
+<div class="pt-3">
+<p class="font-label-sm text-label-sm text-secondary font-semibold text-center mb-1.5">
+                Nama Asisten Dosen :
+              </p>
+<div class="space-y-1 pl-4 font-body-sm text-body-sm text-on-surface-variant">
+<p class="flex justify-between">
+<span class="">1. Mario Andiko Dwi Saputra</span>
+<span class="font-mono text-outline">(G1A025015)</span>
+</p>
+<p class="flex justify-between">
+<span class="">2. Abdillah Siraj Al-Haqqi</span>
+<span class="font-mono text-outline">(G1A025021)</span>
+</p>
+</div>
+</div>
+</div>
+<!-- Sheet Footer Note -->
+<footer class="pt-8 text-center font-label-sm text-label-sm text-outline tracking-wider uppercase">
+            Program Studi Informatika • Fakultas Teknik
+          </footer>
+</div>
+</article>
+<!-- BEGIN: Custom Floating PDF.js Toolbar -->
+<aside aria-label="Pengaturan Pratinjau Dokumen" class="fixed bottom-7 left-1/2 -translate-x-1/2 z-30 bg-surface-container-lowest/95 backdrop-blur-md rounded-full shadow-lg px-6 py-2 flex items-center gap-4 sm:gap-6 text-on-surface select-none">
+<!-- Page Navigation -->
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors" id="prev-page" title="Halaman Sebelumnya" type="button">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container font-label-md text-label-md">
+<span class="font-semibold text-primary" id="current-page-display">1</span>
+<span class="text-outline">/</span>
+<span class="text-outline">28</span>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors" id="next-page" title="Halaman Selanjutnya" type="button">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+<div class="w-px h-5 bg-outline-variant/40 hidden sm:block"></div>
+<!-- Zoom Controls -->
+<div class="hidden sm:flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors" id="zoom-out" title="Perkecil (-)" type="button">
+<span class="material-symbols-outlined text-base">remove</span>
+</button>
+<span class="w-12 text-center font-label-md text-label-md font-mono text-on-surface-variant" id="zoom-label">
+            100%
+          </span>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors" id="zoom-in" title="Perbesar (+)" type="button">
+<span class="material-symbols-outlined text-base">add</span>
+</button>
+</div>
+<div class="w-px h-5 bg-outline-variant/40"></div>
+<!-- Rotation Control -->
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors" id="rotate-page" title="Putar 90°" type="button">
+<span class="material-symbols-outlined text-base">rotate_right</span>
+</button>
+<div class="w-px h-5 bg-outline-variant/40 hidden lg:block"></div>
+<!-- Kiosk Status Indicator -->
+<div class="hidden lg:flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="">Kios Fotokopi Kampus A: <strong class="text-secondary font-semibold">Siap cetak (A4/F4)</strong></span>
+</div>
+</aside>
+<!-- END: Custom Floating PDF.js Toolbar -->
+</main>
+<!-- END: Area Pratinjau Dokumen -->
+</section>
+<!-- Interactive JavaScript for micro-interactions -->
+<script>
+    (function() {
+      let zoomLevel = 100;
+      let rotationAngle = 0;
+      let currentPage = 1;
+      const totalPages = 28;
+
+      const sheet = document.getElementById('pdf-sheet');
+      const zoomLabel = document.getElementById('zoom-label');
+      const pageDisplay = document.getElementById('current-page-display');
+
+      function updateSheetTransform() {
+        if (!sheet) return;
+        sheet.style.transform = `scale(${zoomLevel / 100}) rotate(${rotationAngle}deg)`;
+      }
+
+      document.getElementById('zoom-in')?.addEventListener('click', () => {
+        if (zoomLevel < 160) {
+          zoomLevel += 10;
+          if (zoomLabel) zoomLabel.textContent = `${zoomLevel}%`;
+          updateSheetTransform();
+        }
+      });
+
+      document.getElementById('zoom-out')?.addEventListener('click', () => {
+        if (zoomLevel > 70) {
+          zoomLevel -= 10;
+          if (zoomLabel) zoomLabel.textContent = `${zoomLevel}%`;
+          updateSheetTransform();
+        }
+      });
+
+      document.getElementById('rotate-page')?.addEventListener('click', () => {
+        rotationAngle = (rotationAngle + 90) % 360;
+        updateSheetTransform();
+      });
+
+      document.getElementById('prev-page')?.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          if (pageDisplay) pageDisplay.textContent = currentPage;
+        }
+      });
+
+      document.getElementById('next-page')?.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          if (pageDisplay) pageDisplay.textContent = currentPage;
+        }
+      });
+
+      document.getElementById('modal-print-btn')?.addEventListener('click', () => {
+        window.print();
+      });
+    })();
+  </script>
+</div></main>
+</div>
+<!-- END: BlurredBackgroundDashboard -->
+<!-- BEGIN: ModalContainer -->
+<!-- Main centered PDF Viewer Modal -->
+<section class="relative z-20 w-full max-w-[1240px] h-[942px] flex flex-col bg-white rounded-3xl shadow-modal border border-white/60 overflow-hidden ring-1 ring-black/5 backdrop-blur-xl" data-purpose="pdf-modal">
+<!-- BEGIN: ModalHeader -->
+<!-- Document Title, File Status, and Quick Action Buttons -->
+<header class="bg-white px-5 sm:px-6 py-3.5 border-b border-gray-200/90 flex flex-wrap items-center justify-between gap-3 shadow-xs select-none">
+<!-- File Information (Left) -->
+<div class="flex items-center gap-3 min-w-0">
+<!-- PDF File Icon Badge -->
+<div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center shrink-0 shadow-sm text-red-600">
+<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M7 3C5.343 3 4 4.343 4 6v12c0 1.657 1.343 3 3 3h10c1.657 0 3-1.343 3-3V9.828a2 2 0 00-.586-1.414l-4.828-4.828A2 2 0 0013.172 3H7zm6 2.414L17.586 10H14a1 1 0 01-1-1V5.414zM8 12a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1zm0 3a1 1 0 011-1h4a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+</svg>
+</div>
+<div class="truncate">
+<div class="flex items-center gap-2">
+<h1 class="text-sm sm:text-base font-bold text-gray-900 tracking-tight truncate max-w-xs sm:max-w-md md:max-w-lg" title="TEMPLATE_LAPRAK_PSM_-_Copy_6_.pdf">
+              TEMPLATE_LAPRAK_PSM_-_Copy_6_.pdf
+            </h1>
+<span class="bg-red-100 text-red-700 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full tracking-wider shrink-0 border border-red-200">
+              PDF
+            </span>
+</div>
+<p class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
+<span class="">1.0 MB</span>
+<span class="">•</span>
+<span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-semibold">28 Halaman</span>
+
+
+</p>
+</div>
+</div>
+<!-- Action Buttons (Right) -->
+<div class="flex items-center gap-2 sm:gap-2.5 ml-auto">
+<!-- Print Document Primary Button -->
+<button class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 active:scale-95 transition-all text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2.1 rounded-xl shadow-md shadow-emerald-600/30 ring-1 ring-emerald-400/40" id="btn-print-main" type="button">
+<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="">Cetak Dokumen</span>
+</button>
+<!-- Open in New Tab -->
+<button class="inline-flex items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium text-xs sm:text-sm px-3 sm:px-3.5 py-2 rounded-xl border border-gray-200 transition-colors" type="button">
+<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="hidden sm:inline">Tab Baru</span>
+</button>
+<!-- Direct Download PDF -->
+<button class="inline-flex items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium text-xs sm:text-sm px-3 sm:px-3.5 py-2 rounded-xl border border-gray-200 transition-colors" type="button">
+<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="hidden sm:inline">Download</span>
+</button>
+<div class="h-5 w-px bg-gray-200 mx-0.5"></div>
+<!-- Modal Close Button -->
+<button aria-label="Tutup Dialog" class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-500 transition-colors" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</header>
+<!-- END: ModalHeader -->
+<!-- BEGIN: PDFViewerToolbar -->
+<!-- Integrated Dark Professional PDF Toolbar -->
+<div class="bg-[#2a2f38] text-gray-200 px-4 py-2 border-b border-gray-800 flex items-center justify-between text-xs select-none gap-2 overflow-x-auto">
+<!-- Left Controls: Menu / Filename mini / Page Navigator -->
+<div class="flex items-center gap-2 sm:gap-3 shrink-0">
+<!-- Sidebar Toggle -->
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Daftar Halaman Thumbnail">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-gray-300 text-[11px] font-mono tracking-tight hidden lg:inline max-w-[160px] truncate">
+          TEMPLATE_LAPRAK_P...
+        </span>
+<span class="text-gray-600 hidden lg:inline">|</span>
+<!-- Page Indicator & Input -->
+<div class="flex items-center gap-1.5 bg-black/30 rounded-lg px-2 py-0.5 border border-white/10">
+<button class="p-1 hover:text-white disabled:opacity-30" title="Halaman Sebelumnya">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<input class="w-8 text-center text-xs py-0.5 px-1 bg-white/10 text-white rounded border border-white/20 focus:border-emerald-500 focus:ring-0 font-mono" type="text" value="1">
+<span class="text-gray-400">/ 28</span>
+<button class="p-1 hover:text-white" title="Halaman Selanjutnya">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Center Controls: Zoom, Fit, Orientation -->
+<div class="flex items-center gap-1.5 shrink-0">
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Perkecil (-)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M20 12H4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<div class="px-2 py-0.5 text-center font-mono text-[11px] text-gray-300 bg-white/5 rounded border border-white/10">
+          100%
+        </div>
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Perbesar (+)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-gray-600 mx-1">|</span>
+<!-- Fit Page / Rotate -->
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Sesuaikan Lebar Layar">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M8 7h8m-8 5h8m-8 5h8M4 5v14a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Putar Searah Jarum Jam">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Mode Sorot Teks">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Right Controls: AI Summarize, Print, More -->
+<div class="flex items-center gap-1.5 shrink-0">
+<!-- Summarize Feature -->
+<button class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-white px-2.5 py-1 rounded-md border border-emerald-500/40 font-medium text-[11px] transition-all hover:bg-emerald-600/30">
+<svg class="w-3.5 h-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+<path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+<path clip-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" fill-rule="evenodd"></path>
+</svg>
+<span class="">Summarize</span>
+</button>
+<!-- Search in Document -->
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Cari kata kunci">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Quick Print Icon -->
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Cetak Langsung">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- More options -->
+<button class="p-1.5 rounded hover:bg-white/10 text-gray-300" title="Opsi Lainnya">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- END: PDFViewerToolbar -->
+<!-- BEGIN: PDFViewerCanvas -->
+<!-- Document Viewport with realistic gray backdrop & Centered A4 Sheet -->
+<main class="flex-1 bg-[#32363e] overflow-y-auto p-4 sm:p-8 flex justify-center items-start relative select-text" data-purpose="pdf-viewport">
+<!-- A4 Paper Document Sheet Canvas -->
+<article class="bg-white w-full max-w-[680px] min-h-[960px] p-8 sm:p-14 shadow-pdf border border-neutral-300 relative font-times text-black flex flex-col justify-between my-2 transition-transform duration-150">
+<!-- Outer Border Container matching university lab report standards -->
+<div class="w-full h-full border-2 border-black p-6 sm:p-8 flex flex-col justify-between items-center text-center">
+<!-- Document Header Titles -->
+<div class="space-y-3 pt-2">
+<h2 class="text-base sm:text-xl font-bold tracking-wider uppercase leading-snug">
+              LAPORAN PRAKTIKUM KE-5
+            </h2>
+<h3 class="text-sm sm:text-lg font-bold tracking-wide uppercase leading-snug">
+              PROYEK SISTEM MULTIMEDIA
+            </h3>
+</div>
+<!-- University Logo (Detailed SVG Vector replicating Universitas Bengkulu / Academic Emblem) -->
+<div class="my-8 flex justify-center items-center" data-purpose="academic-emblem">
+<div class="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
+<svg class="w-full h-full drop-shadow-sm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<!-- Pentagon Outer Shield (Deep Navy Blue) -->
+<polygon fill="#0d2b70" points="100,8 190,65 160,178 40,178 10,65" stroke="#000" stroke-width="3"></polygon>
+<!-- Inner Gold/Yellow Pentagon Wing Pattern -->
+<polygon fill="#facc15" points="100,22 174,70 148,162 52,162 26,70" stroke="#ca8a04" stroke-width="2"></polygon>
+<!-- Inner Blue Core -->
+<polygon fill="#1e3a8a" points="100,38 160,78 138,150 62,150 40,78"></polygon>
+<!-- Center Academic Circle -->
+<circle cx="100" cy="100" fill="#ffffff" r="38" stroke="#0d2b70" stroke-width="4"></circle>
+<circle cx="100" cy="100" fill="#0284c7" r="32"></circle>
+<!-- Inner Star and Triangle Emblem details -->
+<polygon fill="#facc15" points="100,75 110,95 90,95" stroke="#713f12" stroke-width="1.5"></polygon>
+<circle cx="100" cy="90" fill="#000" r="2.5"></circle>
+<!-- Wave lines symbolising knowledge / coastal heritage -->
+<path d="M78 110 Q89 105 100 110 T122 110" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="3"></path>
+<path d="M80 118 Q90 113 100 118 T120 118" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Circular Academic Inscription (Arc simulation) -->
+<text fill="#0d2b70" font-family="Arial, sans-serif" font-size="7" font-weight="900" letter-spacing="1" text-anchor="middle" x="100" y="82">UNIVERSITAS</text>
+<text fill="#0d2b70" font-family="Arial, sans-serif" font-size="6.5" font-weight="900" letter-spacing="1" text-anchor="middle" x="100" y="126">BENGKULU</text>
+</svg>
+</div>
+</div>
+<!-- Document Author and Metadata -->
+<div class="w-full max-w-sm mx-auto text-left space-y-6 text-xs sm:text-sm">
+<!-- Student Info Block -->
+<div class="text-center font-bold mb-2">
+              Disusun Oleh :
+            </div>
+<table class="mx-auto border-none font-medium leading-relaxed">
+<tbody>
+<tr>
+<td class="pr-3 font-semibold">Nama</td>
+<td class="pr-2">:</td>
+<td class="italic text-gray-800">[Nama Mahasiswa]</td>
+</tr>
+<tr>
+<td class="pr-3 font-semibold">NPM</td>
+<td class="pr-2">:</td>
+<td class="font-mono">G1A026...</td>
+</tr>
+<tr>
+<td class="pr-3 font-semibold">Kelas</td>
+<td class="pr-2">:</td>
+<td class="">B1</td>
+</tr>
+</tbody>
+</table>
+<!-- Teaching Assistant Info Block -->
+<div class="text-center font-bold pt-2 mb-2">
+              Nama Asisten Dosen :
+            </div>
+<div class="space-y-1 text-left w-full pl-6 sm:pl-10 text-[11px] sm:text-xs">
+<div class="flex justify-between items-center gap-2">
+<span class="">1. Mario Andiko Dwi Saputra</span>
+<span class="font-mono text-gray-700">(G1A025015)</span>
+</div>
+<div class="flex justify-between items-center gap-2">
+<span class="">2. Abdillah Siraj Al-Haqqi</span>
+<span class="font-mono text-gray-700">(G1A025021)</span>
+</div>
+</div>
+</div>
+<!-- Document Bottom Note -->
+<div class="pt-6 text-[11px] text-gray-500 uppercase tracking-widest font-sans">
+            Program Studi Informatika • Fakultas Teknik
+          </div>
+</div>
+</article>
+</main>
+<!-- END: PDFViewerCanvas -->
+<!-- BEGIN: QuickPrintDrawer -->
+<!-- Bottom Floating Quick Print Controller & Kiosk Availability Drawer -->
+<footer class="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 select-none">
+<div class="flex flex-col lg:flex-row items-center justify-between gap-3 text-xs">
+<!-- Kiosk Status Badge -->
+<div class="flex items-center gap-3 w-full lg:w-auto justify-between sm:justify-start">
+<div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-2xs">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+</span>
+<span class="font-semibold text-gray-700">Kios Cetak Kampus A: <strong class="text-emerald-700">Online</strong></span>
+<span class="text-gray-300">|</span>
+<span class="text-gray-500 font-medium">Est. Waktu: ~45 detik</span>
+</div>
+<span class="hidden md:inline text-xs text-gray-400 font-normal">Kertas: Standard A4 70gsm</span>
+</div>
+<!-- Print Parameters Form Bar -->
+<div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-end">
+<!-- Page Range Selector -->
+<div class="flex items-center bg-white rounded-xl border border-gray-200 px-2 py-1 shadow-2xs text-gray-700">
+<span class="text-[11px] text-gray-400 mr-2 font-medium">Halaman:</span>
+<select class="text-xs border-0 py-0.5 pl-1 pr-6 focus:ring-0 text-gray-800 font-semibold cursor-pointer">
+<option>Semua (1-28)</option>
+<option>Halaman Depan Saja (1)</option>
+<option>Rentang Khusus...</option>
+</select>
+</div>
+<!-- Color Mode Toggle -->
+<div class="flex items-center bg-white rounded-xl border border-gray-200 px-2 py-1 shadow-2xs text-gray-700">
+<span class="text-[11px] text-gray-400 mr-2 font-medium">Warna:</span>
+<select class="text-xs border-0 py-0.5 pl-1 pr-6 focus:ring-0 text-gray-800 font-semibold cursor-pointer">
+<option>Warna Asli (Rp 1.000/lbr)</option>
+<option selected="">Hitam Putih (Rp 300/lbr)</option>
+</select>
+</div>
+<!-- Final Confirm & Send to Printer Button -->
+<button class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="">Kirim Cetak Sekarang</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- END: QuickPrintDrawer -->
+</section>
+<!-- END: ModalContainer -->
+<!-- BEGIN: MinimalInteractiveScripts -->
+<script data-purpose="interactivity">
+    // Interactive feedback for main print triggers
+    document.getElementById('btn-print-main').addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+<!-- END: MinimalInteractiveScripts -->
+</body></html>
