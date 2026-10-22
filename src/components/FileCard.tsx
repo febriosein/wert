@@ -148,15 +148,15 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
   return (
     <>
-      <div className="group relative bg-white rounded-[20px] overflow-hidden border border-[#D5EADF] shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div className={`group relative bg-white rounded-[20px] border border-[#D5EADF] shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${showMenu ? "z-30" : ""}`}>
         {/* Critical Expiration Accent: 3px red left bar if < 6 hours */}
         {isUrgent && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D92D3A] z-20"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D92D3A] rounded-l-[20px] z-20"></div>
         )}
 
         <div>
           {/* Top Panel (112px) Color-Coded by File Type */}
-          <div className={`h-28 w-full ${style.bg} relative flex items-center justify-center overflow-hidden`}>
+          <div className={`h-28 w-full ${style.bg} relative flex items-center justify-center rounded-t-[19px]`}>
             {/* Center File Icon / Preview Tile */}
             <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
               {style.icon}
@@ -175,53 +175,63 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-10 z-30 w-52 rounded-2xl bg-white border border-[#D5EADF] shadow-xl py-1.5 text-xs text-[#10241B] animate-in fade-in">
-                  <button
-                    type="button"
-                    onClick={() => {
+                <>
+                  {/* Invisible backdrop to dismiss dropdown on click outside */}
+                  <div
+                    className="fixed inset-0 z-20 cursor-default"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
-                      setShowReplaceModal(true);
                     }}
-                    className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Ganti File (Update)</span>
-                  </button>
-
-                  {file.expires_at && (
+                  />
+                  <div className="absolute right-0 top-10 z-30 w-52 rounded-2xl bg-white border border-[#D5EADF] shadow-xl py-1.5 text-xs text-[#10241B] animate-in fade-in">
                     <button
                       type="button"
-                      onClick={handleExtend}
-                      className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 text-[#087443] font-semibold cursor-pointer"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowReplaceModal(true);
+                      }}
+                      className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Perpanjang 48 Jam</span>
+                      <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Ganti File (Update)</span>
                     </button>
-                  )}
 
-                  <button
-                    type="button"
-                    onClick={handleToggleAutoDelete}
-                    className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 cursor-pointer"
-                  >
-                    <Clock className="w-3.5 h-3.5 text-[#587063]" />
-                    <span>{file.expires_at ? "Matikan Hapus Otomatis" : "Aktifkan Hapus 48 Jam"}</span>
-                  </button>
+                    {file.expires_at && (
+                      <button
+                        type="button"
+                        onClick={handleExtend}
+                        className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 text-[#087443] font-semibold cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Perpanjang 48 Jam</span>
+                      </button>
+                    )}
 
-                  <div className="h-px bg-[#D5EADF] my-1" />
+                    <button
+                      type="button"
+                      onClick={handleToggleAutoDelete}
+                      className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 cursor-pointer"
+                    >
+                      <Clock className="w-3.5 h-3.5 text-[#587063]" />
+                      <span>{file.expires_at ? "Matikan Hapus Otomatis" : "Aktifkan Hapus 48 Jam"}</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowMenu(false);
-                      onDelete(file.id);
-                    }}
-                    className="w-full text-left px-3.5 py-2 hover:bg-[#FFEAEC] text-[#D92D3A] font-semibold flex items-center gap-2 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Hapus File</span>
-                  </button>
-                </div>
+                    <div className="h-px bg-[#D5EADF] my-1" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMenu(false);
+                        onDelete(file.id);
+                      }}
+                      className="w-full text-left px-3.5 py-2 hover:bg-[#FFEAEC] text-[#D92D3A] font-semibold flex items-center gap-2 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus File</span>
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>
