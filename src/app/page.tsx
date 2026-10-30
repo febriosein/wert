@@ -370,8 +370,8 @@ export default function HomePage() {
                     </button>
                   </div>
 
-                  {/* Teks Bantuan & Contoh Cepat */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2.5 px-2">
+                  {/* Teks Bantuan */}
+                  <div className="mt-2.5 px-2">
                     <p className={`text-sm flex items-center gap-1.5 ${error ? "text-[#D92D3A]" : "text-[#587063]"}`}>
                       {error ? (
                         <>
@@ -381,28 +381,10 @@ export default function HomePage() {
                       ) : (
                         <>
                           <Info className="w-4 h-4 text-[#087443] shrink-0" />
-                          <span>3–20 karakter: huruf kecil, angka, - atau _</span>
+                          <span>3-20 karakter: huruf kecil, angka, - atau _</span>
                         </>
                       )}
                     </p>
-
-                    {/* Quick Suggestions Chips */}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-xs text-[#587063] font-medium">Coba:</span>
-                      {["skripsi-andi", "tugas-makalah", "laporan-lab"].map((example) => (
-                        <button
-                          key={example}
-                          type="button"
-                          onClick={() => {
-                            setUsername(example);
-                            router.prefetch(`/${example}`);
-                          }}
-                          className="text-xs px-2.5 py-0.5 rounded-full bg-white hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#087443] font-semibold transition-all hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer shadow-2xs"
-                        >
-                          @{example}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </form>
               </div>
