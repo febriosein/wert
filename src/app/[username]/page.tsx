@@ -335,7 +335,7 @@ export default function UserDashboardPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
-      <Navbar username={username} onOpenQr={() => setIsQrModalOpen(true)} />
+      <Navbar username={username} />
 
       <main className="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {loading ? (
@@ -371,7 +371,8 @@ export default function UserDashboardPage({ params }: PageProps) {
                   File tugasmu
                 </h1>
                 <p className="text-sm text-[#587063] mt-1">
-                  Belum ada file. Tarik file ke sini, atau scan QR dari HP.
+                  <span className="hidden sm:inline">Belum ada file. Tarik file ke sini, atau scan QR dari HP.</span>
+                  <span className="sm:hidden">Belum ada file. Ketuk &apos;Tambah file&apos; untuk mulai mengunggah.</span>
                 </p>
               </div>
 
@@ -379,7 +380,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden sm:flex px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
@@ -487,10 +488,10 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden sm:flex px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
-                  <span className="hidden sm:inline">Upload dari HP</span>
+                  <span>Upload dari HP</span>
                 </button>
 
                 <button
@@ -740,7 +741,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                         <div className="min-w-0">
                           <h4
                             onClick={() => setSelectedFile(file)}
-                            className="font-display font-bold text-sm text-[#10241B] truncate hover:text-[#087443] cursor-pointer"
+                            className="font-display font-bold text-sm text-[#10241B] truncate max-w-[130px] sm:max-w-xs md:max-w-md hover:text-[#087443] cursor-pointer"
                             title={file.display_name}
                           >
                             {file.display_name}
@@ -754,7 +755,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                       </div>
 
                       {/* Row Action Buttons */}
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         <button
                           type="button"
                           onClick={() => setSelectedFile(file)}
@@ -765,18 +766,18 @@ export default function UserDashboardPage({ params }: PageProps) {
                         </button>
                         <a
                           href={`/api/files/${file.id}/download`}
-                          className="w-8 h-8 rounded-xl bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] flex items-center justify-center transition cursor-pointer"
+                          className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] flex items-center justify-center transition cursor-pointer"
                           title="Unduh"
                         >
-                          <Download className="w-3.5 h-3.5" />
+                          <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                         </a>
                         <button
                           type="button"
                           onClick={() => handleRequestDelete(file)}
-                          className="w-8 h-8 rounded-xl bg-white hover:bg-[#FFEAEC] text-[#587063] hover:text-[#D92D3A] border border-[#D5EADF] flex items-center justify-center transition cursor-pointer"
+                          className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-white hover:bg-[#FFEAEC] text-[#587063] hover:text-[#D92D3A] border border-[#D5EADF] flex items-center justify-center transition cursor-pointer"
                           title="Hapus"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -790,7 +791,7 @@ export default function UserDashboardPage({ params }: PageProps) {
 
       {/* FLOATING MULTI-SELECT BULK ACTIONS BAR */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#10241B] text-white px-5 py-3 rounded-[24px] shadow-2xl border-2 border-white/20 flex items-center gap-3 sm:gap-5 animate-in slide-in-from-bottom-6 duration-200">
+        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#10241B] text-white px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-[24px] shadow-2xl border-2 border-white/20 flex items-center justify-between sm:justify-center gap-2.5 sm:gap-5 w-[calc(100vw-24px)] sm:w-auto max-w-[460px] animate-in slide-in-from-bottom-6 duration-200">
           <div className="flex items-center gap-2 border-r border-white/20 pr-3 sm:pr-4">
             <span className="w-2.5 h-2.5 rounded-full bg-[#19C37D] animate-ping" />
             <span className="font-display font-bold text-xs sm:text-sm whitespace-nowrap">

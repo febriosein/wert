@@ -33,7 +33,7 @@ export function HowItWorksSection() {
           {/* =========================================
               KARTU 1: Buat & Buka Halaman
              ========================================= */}
-          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
+          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
             <div>
               {/* Badge Header */}
               <div className="flex items-center justify-between mb-4">
@@ -71,7 +71,7 @@ export function HowItWorksSection() {
           {/* =========================================
               KARTU 2: Buat PIN Keamanan 4 Digit
              ========================================= */}
-          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
+          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
             <div>
               {/* Badge Header */}
               <div className="flex items-center justify-between mb-4">
@@ -117,7 +117,7 @@ export function HowItWorksSection() {
           {/* =========================================
               KARTU 3: Upload File (Laptop / HP)
              ========================================= */}
-          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
+          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
             <div>
               {/* Badge Header */}
               <div className="flex items-center justify-between mb-4">
@@ -163,7 +163,7 @@ export function HowItWorksSection() {
           {/* =========================================
               KARTU 4: Buka di Fotokopi & Cetak
              ========================================= */}
-          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
+          <article className="group bg-white rounded-[24px] border-2 border-[#10241B] shadow-[4px_4px_0px_#10241B] p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_#10241B]">
             <div>
               {/* Badge Header */}
               <div className="flex items-center justify-between mb-4">

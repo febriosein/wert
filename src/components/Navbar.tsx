@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { QrCode, Settings, LogOut, Printer } from "lucide-react";
+import { Settings, LogOut, Printer } from "lucide-react";
 import { useState } from "react";
 
 interface NavbarProps {
   username?: string;
-  onOpenQr?: () => void;
   showActions?: boolean;
 }
 
-export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) {
+export function Navbar({ username, showActions = true }: NavbarProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -57,19 +56,6 @@ export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) 
               <span className="w-2 h-2 rounded-full bg-[#19C37D] animate-pulse"></span>
               @{username}
             </span>
-
-            {/* Tombol Upload dari HP */}
-            {onOpenQr && (
-              <button
-                type="button"
-                onClick={onOpenQr}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] text-xs font-bold bg-white border border-[#D5EADF] text-[#10241B] hover:bg-[#E3F8EC] hover:border-[#087443]/30 shadow-sm transition-all cursor-pointer"
-                title="Buka QR Code untuk upload dari smartphone"
-              >
-                <QrCode className="w-4 h-4 text-[#087443]" />
-                <span className="hidden md:inline">Upload dari HP</span>
-              </button>
-            )}
 
             {/* Ikon Pengaturan */}
             <Link

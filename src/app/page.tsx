@@ -398,7 +398,7 @@ export default function HomePage() {
                     transform: `perspective(1000px) rotateX(${mousePos.y}deg) rotateY(${mousePos.x}deg)`,
                     transition: "transform 0.15s ease-out",
                   }}
-                  className="relative w-full max-w-[440px] aspect-[4/3] flex items-center justify-center select-none"
+                  className="relative w-full max-w-[340px] sm:max-w-[440px] aspect-[4/3] flex items-center justify-center select-none scale-[0.9] sm:scale-100 origin-center"
                 >
                   {/* Latar Ambien Lembut */}
                   <div className="absolute -inset-4 bg-gradient-to-tr from-[#19C37D]/10 via-[#FFE45C]/20 to-blue-400/10 rounded-full blur-2xl -z-10"></div>
@@ -673,11 +673,11 @@ export default function HomePage() {
                 }}
                 className="w-full flex flex-col items-center gap-5"
               >
-                <div className="flex items-center justify-center gap-3 sm:gap-4 w-full">
+                <div className="flex items-center justify-center gap-2.5 sm:gap-4 w-full">
                   {pinDigits.map((digit, idx) => (
                     <div
                       key={idx}
-                      className="w-[56px] sm:w-[64px] h-[64px] sm:h-[72px] rounded-2xl bg-[#F4FBF7] border-2 border-[#D5EADF] focus-within:border-[#087443] focus-within:ring-2 focus-within:ring-[#19C37D]/30 transition-all flex items-center justify-center shadow-inner"
+                      className="w-[52px] sm:w-[64px] h-[60px] sm:h-[72px] rounded-2xl bg-[#F4FBF7] border-2 border-[#D5EADF] focus-within:border-[#087443] focus-within:ring-2 focus-within:ring-[#19C37D]/30 transition-all flex items-center justify-center shadow-inner"
                     >
                       <input
                         ref={pinInputRefs[idx]}
