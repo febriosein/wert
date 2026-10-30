@@ -6,7 +6,7 @@ Versi 1.1 · 22 Oktober 2026 · Status: Disetujui (Approved) · Nama produk: Wer
 
 ## 1. Ringkasan
 
-Wert adalah web app untuk menyimpan file tugas sementara dan membukanya dari komputer mana pun, terutama komputer fotokopian, tanpa login WhatsApp. Pengguna cukup mengetik username (ditambah PIN 4 angka bila dipasang), lalu file tampil di `wert.web.id/username` dengan pratinjau akurat dan tombol update, download, download PDF (untuk Word), download Word (untuk PDF), serta cetak. File terhapus otomatis setelah 48 jam dan fitur ini bisa dimatikan.
+Wert adalah web app untuk menyimpan file tugas sementara dan membukanya dari komputer mana pun, terutama komputer fotokopian, tanpa login WhatsApp. Pengguna cukup mengetik username (ditambah PIN 4 angka bila dipasang), lalu file tampil di `wert.web.id/username` dengan pratinjau akurat dan tombol update, download, download PDF (untuk Word), download Word (untuk PDF), serta cetak. File terhapus otomatis setelah 24 jam dan fitur ini bisa dimatikan.
 
 Stack: Next.js di Vercel, Supabase (Postgres + Storage), dan satu layanan konversi dokumen terpisah.
 
@@ -108,7 +108,7 @@ Prioritas: P0 wajib untuk MVP, P1 penting setelah MVP, P2 opsional.
 
 - (P0) Dropzone mendukung drag & drop, klik, multi-file, progres per file, batal, coba ulang, dan upload resumable (TUS).
 - (P0) Tipe didukung: .docx, .pdf, .xlsx (diasumsikan “.xlxs” berarti .xlsx), .pptx, .jpg/.jpeg, .png, .heic, .zip. Selain itu ditolak dengan pesan jelas. Validasi ekstensi, MIME, dan magic bytes di klien dan server.
-- (P0) Batas (asumsi, dapat dikonfigurasi): 50 MB per file, 20 file per akun, 200 MB total per akun.
+- (P0) Batas (asumsi, dapat dikonfigurasi): 50 MB per file, 20 file per akun, 100 MB total per akun.
 - (P0) Upload langsung ke Supabase Storage lewat signed upload URL atau TUS, bukan lewat Vercel Function, karena batas body request Vercel Function sekitar 4,5 MB.
 - (P0) Nama file disanitasi, object key acak (UUID), dan nama duplikat diberi akhiran (1).
 - (P0) Upload via QR: halaman `/u/{token}` mobile-first tanpa login atau PIN. Token hanya boleh upload (tidak bisa melihat atau mengunduh file), acak ≥ 128 bit (disimpan sebagai hash), TTL 10 menit yang diperpanjang saat aktif hingga maksimum 30 menit, batas 20 file, dan rate limit per token/IP. Token hanya diterbitkan kepada sesi yang sudah lolos PIN. Layar HP menampilkan “Pilih file”, “Ambil foto”, status tiap file, dan pesan “Selesai, cek layar komputer”.
@@ -131,7 +131,7 @@ Viewer: zoom, fit-width, penomoran halaman, render sesuai devicePixelRatio agar 
 
 ### 7.6 Aksi pada File
 
-- Update file (P0): pilih file pengganti dan konfirmasi. File lama diganti secara atomik (ID dan posisi sama; jika upload gagal, file lama tetap utuh), pratinjau dibuat ulang, dan timer 48 jam di-reset. Tanpa riwayat versi di v1.
+- Update file (P0): pilih file pengganti dan konfirmasi. File lama diganti secara atomik (ID dan posisi sama; jika upload gagal, file lama tetap utuh), pratinjau dibuat ulang, dan timer 24 jam di-reset. Tanpa riwayat versi di v1.
 - Download (P0): file asli byte-identik lewat signed URL berumur ≤ 60 detik, `Content-Disposition: attachment`, nama asli.
 - Download PDF (P0, untuk .docx, .pptx, .xlsx): hasil konversi yang sama dengan pratinjau; nama `{nama}.pdf`.
 - Download Word (P1, khusus .pdf): konversi sesuai Bagian 7.8, berjalan asinkron dengan status progres.
@@ -176,11 +176,11 @@ Mesin yang dievaluasi: Adobe PDF Services API (umumnya dinilai berkualitas tingg
 - (P1) Label tombol “Download Word (.docx)” dengan tooltip “Hasil konversi PDF ke Word bisa sedikit berbeda dari PDF asli”.
 - (P1) Kasus gagal: PDF terenkripsi atau ber-password menampilkan pesan jelas; PDF hasil scan menampilkan peringatan (OCR di Fase 3).
 
-### 7.9 Hapus Otomatis 48 Jam
+### 7.9 Hapus Otomatis 24 Jam
 
-- (P0) Default aktif per file: tiap file memiliki timer mandiri (`expires_at`, default 48 jam sejak upload atau update).
-- (P0) Kontrol per file & global: Pengguna dapat mematikan auto-delete untuk file tertentu (`expires_at = NULL`) atau menekan tombol “Perpanjang 48 jam”. Di Pengaturan akun juga terdapat saklar preferensi default untuk file baru.
-- (P0) Hitung mundur di tiap file (“Dihapus dalam 47 j 12 m”), kuning di bawah 6 jam, merah di bawah 1 jam. (P1: tombol “Perpanjang 48 jam”.)
+- (P0) Default aktif per file: tiap file memiliki timer mandiri (`expires_at`, default 24 jam sejak upload atau update).
+- (P0) Kontrol per file & global: Pengguna dapat mematikan auto-delete untuk file tertentu (`expires_at = NULL`) atau menekan tombol “Perpanjang 24 jam”. Di Pengaturan akun juga terdapat saklar preferensi default untuk file baru.
+- (P0) Hitung mundur di tiap file (“Dihapus dalam 23 j 12 m”), kuning di bawah 6 jam, merah di bawah 1 jam. (P1: tombol “Perpanjang 24 jam”.)
 - (P0) Eksekusi: Supabase `pg_cron` tiap 10 menit memicu job purge (Edge Function atau route Vercel dengan secret) yang menghapus objek Storage, derivatif (PDF hasil konversi, JPEG HEIC), dan baris database. Vercel Cron pada plan gratis terbatas frekuensinya, jadi cek batas plan sebelum memakainya.
 - (P0) Penghapusan lazy: semua query memfilter `expires_at > now()` dan signed URL tidak diterbitkan untuk file kedaluwarsa, sehingga file tidak bisa diakses meski job purge terlambat.
 - (P1) Job rekonsiliasi harian membandingkan Storage dengan database dan membersihkan objek yatim.

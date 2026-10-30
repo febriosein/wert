@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { hashToken } from "@/lib/auth/session";
 import { getFileKind, sanitizeFilename } from "@/lib/utils";
+import { purgeExpiredFiles } from "@/lib/storage/purge";
 
 interface RouteProps {
   params: Promise<{ token: string }>;
@@ -65,6 +66,23 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
     }
 
     const user = uploadToken.users as any;
+
+    // Check user active files and capacity limit
+    await purgeExpiredFiles({ userId: user.id }).catch(() => {});
+    const { data: userFiles } = await supabaseAdmin
+      .from("files")
+      .select("id, size_bytes")
+      .eq("user_id", user.id)
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
+
+    if ((userFiles?.length || 0) >= 20) {
+      return NextResponse.json({ error: "Batas maksimum 20 file per akun telah tercapai." }, { status: 400 });
+    }
+
+    const currentTotalSize = userFiles?.reduce((acc, f) => acc + (f.size_bytes || 0), 0) || 0;
+    if (currentTotalSize + file.size > 100 * 1024 * 1024) {
+      return NextResponse.json({ error: "Batas total penyimpanan 100 MB per akun telah tercapai." }, { status: 400 });
+    }
     const displayName = sanitizeFilename(originalName);
     const kind = getFileKind(ext);
     const fileBuffer = Buffer.from(await file.arrayBuffer());
@@ -84,7 +102,7 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
     }
 
     const expiresAt = user.auto_delete_enabled
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       : null;
 
     const { data: newFile, error: insertError } = await supabaseAdmin

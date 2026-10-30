@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sanitizeFilename } from "@/lib/utils";
+import { purgeExpiredFiles } from "@/lib/storage/purge";
 
 const ALLOWED_EXTS = new Set(["docx", "pdf", "xlsx", "pptx", "jpg", "jpeg", "png", "heic", "zip"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_FILES_PER_USER = 20;
-const MAX_TOTAL_SIZE = 200 * 1024 * 1024; // 200MB
+const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
 
 /**
  * POST /api/files/init: Prepare direct upload to Supabase Storage
@@ -36,11 +37,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ukuran file melebihi batas 50 MB." }, { status: 400 });
     }
 
-    // Check file count & total size
+    // Lazy cleanup: purge any expired files for this user immediately
+    await purgeExpiredFiles({ userId: session.userId }).catch(() => {});
+
+    // Check active file count & total size
+    const now = new Date().toISOString();
     const { data: existingFiles, error: queryError } = await supabaseAdmin
       .from("files")
       .select("id, size_bytes")
-      .eq("user_id", session.userId);
+      .eq("user_id", session.userId)
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
 
     if (queryError) {
       return NextResponse.json({ error: queryError.message }, { status: 500 });
@@ -52,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     const currentTotalSize = existingFiles?.reduce((acc, f) => acc + (f.size_bytes || 0), 0) || 0;
     if (currentTotalSize + fileSize > MAX_TOTAL_SIZE) {
-      return NextResponse.json({ error: "Batas total penyimpanan 200 MB per akun telah tercapai." }, { status: 400 });
+      return NextResponse.json({ error: "Batas total penyimpanan 100 MB per akun telah tercapai." }, { status: 400 });
     }
 
     // Generate random file ID & key

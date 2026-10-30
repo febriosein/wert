@@ -17,6 +17,7 @@ import {
   FileCode,
   X,
   Pin,
+  Check,
 } from "lucide-react";
 import { formatBytes, formatCountdown } from "@/lib/utils";
 import { Dropzone } from "./Dropzone";
@@ -39,9 +40,19 @@ interface FileCardProps {
   onDelete: (file: FileItem) => void;
   onRefresh: () => void;
   onOptimisticUpdate?: (id: string, partial: Partial<FileItem>) => void;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
-export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpdate }: FileCardProps) {
+export function FileCard({
+  file,
+  onPreview,
+  onDelete,
+  onRefresh,
+  onOptimisticUpdate,
+  isSelected,
+  onToggleSelect,
+}: FileCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showReplaceModal, setShowReplaceModal] = useState(false);
 
@@ -115,10 +126,12 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
   const style = getFileTypeStyle(cleanExt);
   const isUrgent = Boolean(file.expires_at && countdown.isUrgent);
+  const isImage = ["png", "jpg", "jpeg", "webp", "gif"].includes(cleanExt);
+  const [imageError, setImageError] = useState(false);
 
   const handleExtend = async () => {
     setShowMenu(false);
-    const newExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     onOptimisticUpdate?.(file.id, { expires_at: newExpiresAt });
     try {
       await fetch(`/api/files/${file.id}`, {
@@ -133,7 +146,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
   const handleToggleAutoDelete = async () => {
     setShowMenu(false);
-    const newExpiresAt = file.expires_at ? null : new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const newExpiresAt = file.expires_at ? null : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     onOptimisticUpdate?.(file.id, { expires_at: newExpiresAt });
     try {
       await fetch(`/api/files/${file.id}`, {
@@ -148,19 +161,106 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
   return (
     <>
-      <div className={`group relative bg-white rounded-[20px] border border-[#D5EADF] shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${showMenu ? "z-30" : ""}`}>
+      <div
+        className={`group relative bg-white rounded-[20px] transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+          isSelected
+            ? "border-2 border-[#087443] ring-2 ring-[#087443]/30 shadow-md -translate-y-1"
+            : "border border-[#D5EADF] shadow-soft hover:shadow-[0_12px_28px_rgba(8,116,67,0.12)] hover:-translate-y-1"
+        } ${showMenu ? "z-30" : ""}`}
+      >
         {/* Critical Expiration Accent: 3px red left bar if < 6 hours */}
         {isUrgent && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D92D3A] rounded-l-[20px] z-20"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D92D3A] z-20"></div>
         )}
 
         <div>
-          {/* Top Panel (112px) Color-Coded by File Type */}
-          <div className={`h-28 w-full ${style.bg} relative flex items-center justify-center rounded-t-[19px]`}>
-            {/* Center File Icon / Preview Tile */}
-            <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
-              {style.icon}
-            </div>
+          {/* Top Panel (112px) Color-Coded by File Type with Smart Document Preview */}
+          <div className={`h-28 w-full ${style.bg} relative flex items-center justify-center overflow-hidden`}>
+            {/* Multi-Select Checkbox (Top Left) */}
+            {onToggleSelect && (
+              <div className="absolute top-2.5 left-2.5 z-20">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSelect(file.id);
+                  }}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[#087443] text-white shadow-sm ring-2 ring-white scale-105"
+                      : "bg-white/80 backdrop-blur-xs text-transparent hover:text-[#587063] hover:bg-white border border-[#10241B]/20"
+                  }`}
+                  title={isSelected ? "Batal pilih" : "Pilih file"}
+                  aria-label="Pilih file"
+                >
+                  <Check className={`w-4 h-4 stroke-[3] ${isSelected ? "text-white" : "opacity-0 group-hover:opacity-60"}`} />
+                </button>
+              </div>
+            )}
+
+            {isImage && !imageError ? (
+              /* Real Image Thumbnail with Zoom and Vignette */
+              <div
+                className="w-full h-full relative overflow-hidden cursor-pointer"
+                onClick={() => onPreview(file)}
+              >
+                <img
+                  src={`/api/files/${file.id}/preview`}
+                  alt={file.display_name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={() => setImageError(true)}
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold font-mono tracking-wider flex items-center gap-1">
+                  <ImageIcon className="w-3 h-3 text-[#FFE45C]" />
+                  <span>FOTO</span>
+                </div>
+              </div>
+            ) : (
+              /* Tactile Paper Document Sheet for PDF, DOCX, XLSX, etc. */
+              <div
+                onClick={() => onPreview(file)}
+                className="relative w-full h-full flex items-center justify-center cursor-pointer select-none p-3"
+              >
+                <div className="paper-sheet w-24 h-[76px] rounded-md p-1.5 flex flex-col justify-between group-hover:-translate-y-1 group-hover:rotate-1 transition-all duration-300">
+                  {/* Folded dog-ear corner */}
+                  <div className="dog-ear-corner" />
+
+                  {/* Header Ribbon with format badge */}
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="text-[9px] font-extrabold px-1.5 py-0.2 rounded text-white uppercase tracking-wider"
+                      style={{ backgroundColor: style.color }}
+                    >
+                      {file.ext}
+                    </span>
+                    <span className="text-[8px] text-[#587063] font-mono mr-2">
+                      {cleanExt === "pdf" ? "PDF" : cleanExt.includes("doc") ? "WORD" : "DOC"}
+                    </span>
+                  </div>
+
+                  {/* Skeleton paragraph lines */}
+                  <div className="space-y-1 my-0.5">
+                    <div className="h-1 w-3/4 rounded-full bg-[#10241B]/15"></div>
+                    <div className="h-1 w-full rounded-full bg-[#10241B]/10"></div>
+                    <div className="h-1 w-5/6 rounded-full bg-[#10241B]/10"></div>
+                  </div>
+
+                  {/* Bottom mini status */}
+                  <div className="flex items-center justify-between text-[8px] text-[#587063] font-medium border-t border-[#D5EADF]/60 pt-0.5">
+                    <span className="truncate max-w-[55px] font-mono">{formatBytes(file.size_bytes)}</span>
+                    <div style={{ color: style.color }}>
+                      {cleanExt === "pdf" ? (
+                        <FileText className="w-2.5 h-2.5" />
+                      ) : (
+                        <Printer className="w-2.5 h-2.5" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Menu ⋮ Button (36x36px) */}
             <div className="absolute top-2.5 right-2.5 z-20">
@@ -204,7 +304,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                         className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 text-[#087443] font-semibold cursor-pointer"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Perpanjang 48 Jam</span>
+                        <span>Perpanjang 24 Jam</span>
                       </button>
                     )}
 
@@ -214,7 +314,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                       className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 cursor-pointer"
                     >
                       <Clock className="w-3.5 h-3.5 text-[#587063]" />
-                      <span>{file.expires_at ? "Matikan Hapus Otomatis" : "Aktifkan Hapus 48 Jam"}</span>
+                      <span>{file.expires_at ? "Matikan Hapus Otomatis" : "Aktifkan Hapus 24 Jam"}</span>
                     </button>
 
                     <div className="h-px bg-[#D5EADF] my-1" />
@@ -265,8 +365,11 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
                   <span>Disimpan terus</span>
                 </div>
               ) : countdown.isUrgent ? (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFEAEC] text-[#D92D3A] text-xs font-bold border border-[#D92D3A]/30 animate-pulse">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFEAEC] text-[#D92D3A] text-xs font-bold border border-[#D92D3A]/30 shadow-xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D92D3A] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D92D3A]"></span>
+                  </span>
                   <span>{countdown.text}</span>
                 </div>
               ) : countdown.isWarning ? (
@@ -284,12 +387,12 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
           </div>
         </div>
 
-        {/* Action Buttons: Lihat & Cetak + Unduh */}
+        {/* Action Buttons: Lihat & Cetak + Unduh with Tactile Physics */}
         <div className="p-5 pt-2 flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => onPreview(file)}
-            className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all cursor-pointer"
+            className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow-md btn-tactile transition-all cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>Lihat & cetak</span>
@@ -297,7 +400,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
 
           <a
             href={`/api/files/${file.id}/download`}
-            className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] hover:border-[#19C37D] text-[#10241B] flex items-center justify-center btn-tactile transition-colors cursor-pointer"
             title="Unduh file"
             aria-label="Unduh file"
           >
@@ -321,7 +424,7 @@ export function FileCard({ file, onPreview, onDelete, onRefresh, onOptimisticUpd
             <div>
               <h3 className="font-display text-xl font-bold text-[#10241B]">Ganti File Dokumen</h3>
               <p className="text-xs text-[#587063] mt-1 leading-relaxed">
-                Mengganti isi file <b>{file.display_name}</b> secara atomik. Timer 48 jam akan di-reset dan pratinjau diperbarui.
+                Mengganti isi file <b>{file.display_name}</b> secara atomik. Timer 24 jam akan di-reset dan pratinjau diperbarui.
               </p>
             </div>
 

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const kind = getFileKind(ext);
     const expiresAt = session.autoDeleteEnabled
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       : null;
 
     // Insert file record

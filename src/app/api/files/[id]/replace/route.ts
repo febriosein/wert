@@ -14,7 +14,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 /**
  * PUT /api/files/[id]/replace: Atomic file replacement (PRD 7.6)
  * Replaces existing file while preserving the same file ID & list order.
- * Resets 48h timer and recreates preview cleanly.
+ * Resets 24h timer and recreates preview cleanly.
  */
 export async function PUT(req: NextRequest, { params }: RouteProps) {
   try {
@@ -93,9 +93,9 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
       await supabaseAdmin.storage.from("derived").remove(oldDerivedKeys).catch(() => {});
     }
 
-    // Reset 48h expiration timer
+    // Reset 24h expiration timer
     const newExpiresAt = session.autoDeleteEnabled
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       : null;
 
     // Atomically update DB record

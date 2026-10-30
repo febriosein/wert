@@ -17,13 +17,23 @@ export async function POST(req: NextRequest) {
     const ttlMinutes = 10;
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 
+    // Calculate remaining allowed files for this user
+    const now = new Date().toISOString();
+    const { count: activeCount } = await supabaseAdmin
+      .from("files")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", session.userId)
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
+
+    const remainingSlots = Math.max(0, 20 - (activeCount || 0));
+
     const { error: insertError } = await supabaseAdmin
       .from("upload_tokens")
       .insert({
         token_hash: tokenHash,
         user_id: session.userId,
         expires_at: expiresAt.toISOString(),
-        max_files: 20,
+        max_files: Math.min(20, remainingSlots),
       });
 
     if (insertError) {

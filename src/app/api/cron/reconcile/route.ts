@@ -1,20 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+function isAuthorized(req: NextRequest): boolean {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) return true;
+
+  const authHeader = req.headers.get("authorization");
+  if (authHeader === `Bearer ${cronSecret}`) return true;
+
+  const urlSecret = req.nextUrl.searchParams.get("secret");
+  if (urlSecret === cronSecret) return true;
+
+  return false;
+}
+
 /**
- * POST /api/cron/reconcile: Orphan Storage Reconciliation (PRD 7.9)
+ * Orphan Storage Reconciliation (PRD 7.9)
  * Compares files in Supabase Storage with DB records and purges orphaned objects.
  */
-export async function POST(req: NextRequest) {
+async function handleReconcile(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const urlSecret = req.nextUrl.searchParams.get("secret");
-      if (urlSecret !== cronSecret) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!isAuthorized(req)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // 1. Fetch all active storage keys from DB
@@ -80,4 +87,12 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Gagal rekonsiliasi storage" }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+  return handleReconcile(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handleReconcile(req);
 }

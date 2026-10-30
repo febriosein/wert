@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
             <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">2. Hapus Otomatis (Auto-Delete)</h3>
             <p>
-              Secara default, seluruh file yang Anda unggah akan <b>terhapus secara permanen setelah 48 jam</b>. Anda dapat mematikan fitur ini atau memperpanjang timer melalui tombol pengaturan file. Ketika file dihapus, file asli beserta turunan PDF pratinjaunya langsung dihapus dari media penyimpanan.
+              Secara default, seluruh file yang Anda unggah akan <b>terhapus secara permanen setelah 24 jam</b>. Anda dapat mematikan fitur ini atau memperpanjang timer melalui tombol pengaturan file. Ketika file dihapus, file asli beserta turunan PDF pratinjaunya langsung dihapus dari media penyimpanan.
             </p>
 
             <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">3. Pemrosesan & Penyimpanan Dokumen</h3>

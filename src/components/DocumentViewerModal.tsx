@@ -22,6 +22,7 @@ import {
 import { FileItem } from "./FileCard";
 import { useRouter } from "next/navigation";
 import { formatBytes } from "@/lib/utils";
+import { sound } from "@/lib/audio";
 
 interface DocumentViewerModalProps {
   file: FileItem | null;
@@ -38,7 +39,9 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
   const router = useRouter();
   const [printing, setPrinting] = useState(false);
   const [showLogoutPrompt, setShowLogoutPrompt] = useState(false);
+  const [logoutCountdown, setLogoutCountdown] = useState(60);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [rotation, setRotation] = useState(0);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [iframeError, setIframeError] = useState(false);
 
@@ -46,7 +49,41 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
   useEffect(() => {
     setIframeLoaded(false);
     setIframeError(false);
+    setZoomLevel(100);
+    setRotation(0);
   }, [file?.id]);
+
+  // Keyboard shortcut listener inside modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // Auto-logout countdown when print prompt is triggered
+  useEffect(() => {
+    if (!showLogoutPrompt) return;
+    setLogoutCountdown(60);
+    const interval = setInterval(() => {
+      setLogoutCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          handleLogout();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [showLogoutPrompt]);
 
   // ZIP contents state
   const [zipEntries, setZipEntries] = useState<ZipEntry[]>([]);
@@ -79,6 +116,7 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
   if (!file) return null;
 
   const handlePrint = () => {
+    sound.playPaperSlide();
     setPrinting(true);
     const targetUrl = previewUrl;
 
@@ -246,13 +284,16 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
             /* Image Preview on White Sheet */
             <div className="flex flex-col items-center justify-center w-full min-h-full">
               <div
-                className="bg-white rounded-2xl border border-[#D5EADF] shadow-md p-4 max-w-full overflow-hidden transition-transform duration-200"
-                style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "center center" }}
+                className="bg-white rounded-2xl border border-[#D5EADF] shadow-md p-4 max-w-full overflow-hidden transition-all duration-300"
+                style={{
+                  transform: `scale(${zoomLevel / 100}) rotate(${rotation}deg)`,
+                  transformOrigin: "center center",
+                }}
               >
                 <img
                   src={previewUrl}
                   alt={file.display_name}
-                  className="max-h-[70vh] max-w-full object-contain rounded-xl select-none"
+                  className="max-h-[65vh] max-w-full object-contain rounded-xl select-none"
                 />
               </div>
 
@@ -261,27 +302,43 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
                 <button
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.max(50, z - 25))}
-                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition"
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition cursor-pointer"
                   title="Perkecil"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
-                <span className="w-12 text-center text-[#10241B]">{zoomLevel}%</span>
+                <span className="w-12 text-center text-[#10241B] font-mono">{zoomLevel}%</span>
                 <button
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.min(250, z + 25))}
-                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition"
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] transition cursor-pointer"
                   title="Perbesar"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </button>
+
+                {/* Rotate 90 deg */}
                 <button
                   type="button"
-                  onClick={() => setZoomLevel(100)}
-                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] ml-1 border-l border-[#D5EADF] pl-2 transition"
-                  title="Reset Ukuran"
+                  onClick={() => setRotation((r) => (r + 90) % 360)}
+                  className="p-1 hover:bg-[#E3F8EC] rounded-full text-[#587063] hover:text-[#10241B] ml-1 border-l border-[#D5EADF] pl-2 transition cursor-pointer flex items-center gap-1"
+                  title="Putar Orientasi 90°"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
+                  <span className="text-[10px] text-[#587063]">{rotation}°</span>
+                </button>
+
+                {/* Reset button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoomLevel(100);
+                    setRotation(0);
+                  }}
+                  className="px-2 py-0.5 hover:bg-[#E3F8EC] rounded-full text-[10px] text-[#587063] hover:text-[#10241B] ml-1 transition cursor-pointer"
+                  title="Reset Ukuran & Orientasi"
+                >
+                  Reset
                 </button>
               </div>
             </div>
@@ -328,18 +385,24 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
 
         {/* Photocopy Privacy Logout Prompt after printing */}
         {showLogoutPrompt && (
-          <div className="p-4 bg-[#FFF4B8] border-t border-[#FFE45C] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-[#10241B]">
-              <Check className="w-4 h-4 text-[#087443] shrink-0" />
-              <span>
-                <b>Dokumen dikirim ke printer!</b> Jika selesai menggunakan komputer fotokopi, silakan keluar untuk keamanan privasi Anda.
-              </span>
+          <div className="p-4 bg-[#FFF4B8] border-t border-[#FFE45C] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs animate-in slide-in-from-bottom-2 duration-200">
+            <div className="flex items-center gap-2.5 text-[#10241B]">
+              <div className="w-6 h-6 rounded-full bg-[#19C37D] text-[#10241B] flex items-center justify-center font-bold shrink-0">
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <span className="font-bold text-[#10241B]">Dokumen dikirim ke printer!</span>
+                <span className="text-[#587063]">
+                  Halaman otomatis logout dalam{" "}
+                  <b className="text-[#D92D3A] font-mono text-sm">{logoutCountdown}s</b> demi menjaga keamanan tugasmu di komputer umum.
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="px-3.5 py-1.5 rounded-xl bg-[#D92D3A] hover:bg-red-700 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="px-4 py-2 rounded-xl bg-[#D92D3A] hover:bg-red-700 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm btn-tactile"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Keluar Sekarang</span>
@@ -347,9 +410,9 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
               <button
                 type="button"
                 onClick={() => setShowLogoutPrompt(false)}
-                className="px-3 py-1.5 rounded-xl bg-white border border-[#D5EADF] text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-white border border-[#D5EADF] text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer font-medium"
               >
-                Tetap di Halaman
+                Tetap di Halaman (Batal Timer)
               </button>
             </div>
           </div>

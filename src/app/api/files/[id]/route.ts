@@ -75,13 +75,13 @@ export async function PATCH(req: NextRequest, { params }: RouteProps) {
     let newExpiresAt: string | null = null;
 
     if (action === "extend") {
-      // Extend 48 hours from now
-      newExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+      // Extend 24 hours from now
+      newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     } else if (action === "toggle_auto_delete") {
       if (file.expires_at) {
         newExpiresAt = null; // Disable auto-delete for this file
       } else {
-        newExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+        newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       }
     }
 

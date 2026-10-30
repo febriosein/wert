@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, DragEvent, ChangeEvent } from "react";
+import { useState, useRef, useEffect, DragEvent, ChangeEvent } from "react";
 import {
   UploadCloud,
   Camera,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { validateMagicBytes } from "@/lib/storage/validator";
+import { sound } from "@/lib/audio";
 
 interface UploadingFile {
   id: string;
@@ -29,13 +30,21 @@ interface DropzoneProps {
   onUploadSuccess: () => void;
   token?: string; // Optional token if uploading via mobile /u/[token]
   replaceFileId?: string; // Optional file ID if in replacement mode
+  initialFiles?: File[];
 }
 
-export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProps) {
+export function Dropzone({ onUploadSuccess, token, replaceFileId, initialFiles }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [items, setItems] = useState<UploadingFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-process initial files if supplied externally (e.g. from global drop or paste)
+  useEffect(() => {
+    if (initialFiles && initialFiles.length > 0) {
+      processFiles(initialFiles);
+    }
+  }, [initialFiles]);
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -123,6 +132,7 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
+        sound.playSuccess();
         onUploadSuccess();
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -152,6 +162,7 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
+        sound.playSuccess();
         onUploadSuccess();
       } else {
         // Direct Signed URL route for zero Vercel payload limit issues
@@ -232,6 +243,7 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId }: DropzoneProp
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
+        sound.playSuccess();
         onUploadSuccess();
       }
     } catch (err: any) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSession, destroySession } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { verifyPin } from "@/lib/auth/pin";
+import { purgeExpiredFiles } from "@/lib/storage/purge";
 
 /**
  * GET /api/settings: Account overview & quota stats
@@ -13,6 +14,11 @@ export async function GET() {
       return NextResponse.json({ error: "Sesi tidak valid." }, { status: 401 });
     }
 
+    // Lazy cleanup: purge any expired files for this user immediately
+    await purgeExpiredFiles({ userId: session.userId }).catch((err) =>
+      console.error("[Settings] Lazy purge error:", err)
+    );
+
     const { data: user, error: userError } = await supabaseAdmin
       .from("users")
       .select("id, username, pin_hash, auto_delete_enabled, created_at, last_active_at")
@@ -23,11 +29,14 @@ export async function GET() {
       return NextResponse.json({ error: "Pengguna tidak ditemukan." }, { status: 404 });
     }
 
-    // Get files count and total size
+    const now = new Date().toISOString();
+
+    // Get active files count and total size
     const { data: files } = await supabaseAdmin
       .from("files")
       .select("size_bytes")
-      .eq("user_id", session.userId);
+      .eq("user_id", session.userId)
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
 
     const filesCount = files ? files.length : 0;
     const totalSizeBytes = files ? files.reduce((acc, f) => acc + (f.size_bytes || 0), 0) : 0;
@@ -40,7 +49,7 @@ export async function GET() {
       filesCount,
       totalSizeBytes,
       maxFiles: 20,
-      maxSizeBytes: 200 * 1024 * 1024, // 200MB
+      maxSizeBytes: 100 * 1024 * 1024, // 100MB
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Gagal mengambil pengaturan" }, { status: 500 });
@@ -67,9 +76,9 @@ export async function PATCH(req: NextRequest) {
         .update({ auto_delete_enabled: body.autoDeleteEnabled })
         .eq("id", session.userId);
 
-      // If re-enabling auto-delete, recalculate 48h timer for all existing files
+      // If re-enabling auto-delete, recalculate 24h timer for all existing files
       if (body.autoDeleteEnabled) {
-        const newExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+        const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
         await supabaseAdmin
           .from("files")
           .update({ expires_at: newExpiresAt })

@@ -164,9 +164,12 @@ export function QrModal({ isOpen, onClose, username }: QrModalProps) {
             </div>
 
             <div className="flex items-center justify-between w-full mt-3 px-1 text-xs">
-              <span className={`font-semibold ${remainingMinutes <= 2 ? "text-[#D92D3A]" : "text-[#587063]"}`}>
-                {remainingMinutes > 0 ? `Berlaku ${remainingMinutes} mnt` : "Kedaluwarsa"}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#19C37D] animate-ping" />
+                <span className={`font-semibold ${remainingMinutes <= 2 ? "text-[#D92D3A]" : "text-[#087443]"}`}>
+                  {remainingMinutes > 0 ? `Berlaku ${remainingMinutes} mnt` : "Kedaluwarsa"}
+                </span>
+              </div>
 
               <button
                 type="button"

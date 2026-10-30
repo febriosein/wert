@@ -50,7 +50,7 @@ export default function TermsPage() {
 
             <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">3. Batasan Kuota & Penghapusan Otomatis</h3>
             <p>
-              Setiap akun dibatasi hingga 20 file dan maksimal 200 MB. File akan terhapus otomatis setelah 48 jam kecuali diatur sebaliknya oleh pengguna. Pengelola berhak menghapus akun yang tidak memiliki aktivitas selama 30 hari guna mendaur ulang username yang tidak terpakai.
+              Setiap akun dibatasi hingga 20 file dan maksimal 100 MB. File akan terhapus otomatis setelah 24 jam kecuali diatur sebaliknya oleh pengguna. Pengelola berhak menghapus akun yang tidak memiliki aktivitas selama 30 hari guna mendaur ulang username yang tidak terpakai.
             </p>
 
             <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-2">4. Penafian Tanggung Jawab (Disclaimer)</h3>

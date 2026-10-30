@@ -48,6 +48,18 @@ export default function HomePage() {
   const [newPinInput, setNewPinInput] = useState("");
   const [copiedCode, setCopiedCode] = useState(false);
 
+  // Interactive 3D mouse parallax on printer
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handlePrinterMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x: x * 8, y: -y * 8 });
+  };
+  const handlePrinterMouseLeave = () => {
+    setMousePos({ x: 0, y: 0 });
+  };
+
   const cleanUsername = username.trim().toLowerCase();
   const isValidUsername = cleanUsername.length >= 3 && cleanUsername.length <= 20;
 
@@ -308,7 +320,7 @@ export default function HomePage() {
                     Nama halamanmu
                   </label>
 
-                  <div className="relative bg-white rounded-[24px] border-2 border-[#10241B] shadow-sticker min-h-[72px] p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-all">
+                  <div className="relative bg-white rounded-[24px] border-2 border-[#10241B] shadow-sticker min-h-[72px] p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-all focus-within:ring-4 focus-within:ring-[#19C37D]/25">
                     {/* Prefix & Input Segment */}
                     <div className="flex items-center flex-1 min-w-0 px-3 py-1">
                       <span className="font-display font-semibold text-lg sm:text-[22px] text-[#587063] select-none whitespace-nowrap">
@@ -333,7 +345,7 @@ export default function HomePage() {
                         className="w-full font-display font-semibold text-lg sm:text-[22px] text-[#10241B] placeholder-[#587063]/40 bg-transparent outline-none border-none p-0 ml-1 min-w-0"
                       />
                       {isValidUsername && (
-                        <div className="flex-shrink-0 text-[#087443] ml-1 flex items-center">
+                        <div className="flex-shrink-0 text-[#087443] ml-1 flex items-center animate-in zoom-in-75 duration-200">
                           <CheckCircle2 className="w-6 h-6 fill-[#19C37D] text-[#10241B]" />
                         </div>
                       )}
@@ -343,7 +355,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={loading || !cleanUsername}
-                      className="h-[52px] rounded-[16px] bg-[#087443] hover:bg-[#065b34] text-white font-bold px-6 flex items-center justify-center gap-2 transition-all duration-150 active:translate-y-0.5 flex-shrink-0 shadow-sm cursor-pointer disabled:opacity-50"
+                      className="h-[52px] rounded-[16px] bg-[#087443] hover:bg-[#065b34] text-white font-bold px-6 flex items-center justify-center gap-2 transition-all duration-150 btn-tactile flex-shrink-0 shadow-sm cursor-pointer disabled:opacity-50"
                     >
                       {loading ? (
                         <RefreshCw className="w-5 h-5 animate-spin" />
@@ -356,8 +368,8 @@ export default function HomePage() {
                     </button>
                   </div>
 
-                  {/* Teks Bantuan & Error */}
-                  <div className="flex items-center justify-between mt-2.5 px-2">
+                  {/* Teks Bantuan & Contoh Cepat */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2.5 px-2">
                     <p className={`text-sm flex items-center gap-1.5 ${error ? "text-[#D92D3A]" : "text-[#587063]"}`}>
                       {error ? (
                         <>
@@ -371,20 +383,46 @@ export default function HomePage() {
                         </>
                       )}
                     </p>
+
+                    {/* Quick Suggestions Chips */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs text-[#587063] font-medium">Coba:</span>
+                      {["skripsi-andi", "tugas-makalah", "laporan-lab"].map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          onClick={() => {
+                            setUsername(example);
+                            router.prefetch(`/${example}`);
+                          }}
+                          className="text-xs px-2.5 py-0.5 rounded-full bg-white hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#087443] font-semibold transition-all hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer shadow-2xs"
+                        >
+                          @{example}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </form>
               </div>
 
-              {/* Kolom Kanan: Ilustrasi Murni CSS & Vektor "Printer-Lembaran" */}
+              {/* Kolom Kanan: Ilustrasi Murni CSS & Vektor "Living Printer Engine" */}
               <div className="lg:col-span-5 flex items-center justify-center relative py-6">
-                <div className="relative w-full max-w-[440px] aspect-[4/3] flex items-center justify-center select-none">
+                <div
+                  onMouseMove={handlePrinterMouseMove}
+                  onMouseLeave={handlePrinterMouseLeave}
+                  style={{
+                    transform: `perspective(1000px) rotateX(${mousePos.y}deg) rotateY(${mousePos.x}deg)`,
+                    transition: "transform 0.15s ease-out",
+                  }}
+                  className="relative w-full max-w-[440px] aspect-[4/3] flex items-center justify-center select-none"
+                >
                   {/* Latar Ambien Lembut */}
                   <div className="absolute -inset-4 bg-gradient-to-tr from-[#19C37D]/10 via-[#FFE45C]/20 to-blue-400/10 rounded-full blur-2xl -z-10"></div>
 
                   {/* Lembaran Kertas yang Meluncur Keluar (Stacked Sheets) */}
                   <div className="absolute top-2 w-[270px] sm:w-[310px] flex justify-center z-10">
                     {/* Lembar 1: PDF (-4 deg) */}
-                    <div className="absolute -left-2 sm:left-0 top-3 w-[150px] sm:w-[170px] h-[160px] bg-white rounded-xl border-2 border-[#10241B] shadow-[3px_3px_0_#10241B] -rotate-[4deg] p-3 flex flex-col justify-between transition-transform hover:-translate-y-2 hover:-rotate-[6deg] cursor-default">
+                    <div className="absolute -left-2 sm:left-0 top-3 w-[150px] sm:w-[170px] h-[160px] bg-white rounded-xl border-2 border-[#10241B] shadow-[3px_3px_0_#10241B] -rotate-[4deg] p-3 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:-rotate-[6deg] cursor-default">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#FF5A4F] text-white">
@@ -403,28 +441,44 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* Lembar 2: DOCX (0 deg Tengah) */}
-                    <div className="relative top-0 w-[156px] sm:w-[176px] h-[170px] bg-white rounded-xl border-2 border-[#10241B] shadow-sticker rotate-0 p-3 flex flex-col justify-between z-10 transition-transform hover:-translate-y-2 cursor-default">
+                    {/* Lembar 2: DOCX (0 deg Tengah) - Reaktif Terhadap Ketikan Pengguna */}
+                    <div
+                      className={`relative top-0 w-[156px] sm:w-[176px] h-[170px] bg-white rounded-xl border-2 border-[#10241B] rotate-0 p-3 flex flex-col justify-between z-10 transition-all duration-300 ${
+                        cleanUsername
+                          ? "-translate-y-3.5 shadow-sticker-lg border-[#087443]"
+                          : "shadow-sticker hover:-translate-y-2"
+                      } cursor-default`}
+                    >
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#3B82F6] text-white">
-                            DOCX
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold text-white transition-colors ${
+                              isValidUsername ? "bg-[#19C37D] text-[#10241B]" : "bg-[#3B82F6]"
+                            }`}
+                          >
+                            {isValidUsername ? "SIAP CETAK" : cleanUsername ? "MEMUAT" : "DOCX"}
                           </span>
-                          <span className="text-[10px] text-[#587063] font-mono">420 KB</span>
+                          <span className="text-[10px] text-[#587063] font-mono">
+                            {cleanUsername ? "420 KB" : "420 KB"}
+                          </span>
                         </div>
                         <div className="h-2 w-4/5 bg-[#10241B]/20 rounded mb-1.5"></div>
                         <div className="h-1.5 w-full bg-[#10241B]/10 rounded mb-1"></div>
                         <div className="h-1.5 w-full bg-[#10241B]/10 rounded mb-1"></div>
                         <div className="h-1.5 w-3/4 bg-[#10241B]/10 rounded"></div>
                       </div>
-                      <div className="flex items-center justify-between text-[10px] text-[#587063] font-medium">
-                        <span className="truncate">Tugas_Bio_Final</span>
-                        <FileText className="w-3.5 h-3.5 text-[#3B82F6]" />
+                      <div className="flex items-center justify-between text-[10px] text-[#587063] font-semibold">
+                        <span className="truncate max-w-[100px]">
+                          {cleanUsername ? `${cleanUsername}.docx` : "Tugas_Bio_Final"}
+                        </span>
+                        <FileText
+                          className={`w-3.5 h-3.5 ${isValidUsername ? "text-[#087443]" : "text-[#3B82F6]"}`}
+                        />
                       </div>
                     </div>
 
                     {/* Lembar 3: PNG (+5 deg) dengan Stabilo Kuning */}
-                    <div className="absolute -right-2 sm:right-0 top-1 w-[150px] sm:w-[170px] h-[165px] bg-white rounded-xl border-2 border-[#10241B] shadow-[3px_3px_0_#10241B] rotate-[5deg] p-3 flex flex-col justify-between transition-transform hover:-translate-y-2 hover:rotate-[7deg] cursor-default">
+                    <div className="absolute -right-2 sm:right-0 top-1 w-[150px] sm:w-[170px] h-[165px] bg-white rounded-xl border-2 border-[#10241B] shadow-[3px_3px_0_#10241B] rotate-[5deg] p-3 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:rotate-[7deg] cursor-default">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#8B5CF6] text-white">
@@ -450,30 +504,58 @@ export default function HomePage() {
                   </div>
 
                   {/* Badan Printer Hijau #19C37D */}
-                  <div className="absolute bottom-3 w-[290px] sm:w-[330px] bg-[#19C37D] rounded-[20px] border-2 border-[#10241B] shadow-sticker-lg p-4 flex flex-col items-center z-20">
+                  <div className="absolute bottom-3 w-[290px] sm:w-[330px] bg-[#19C37D] rounded-[20px] border-2 border-[#10241B] shadow-sticker-lg p-4 flex flex-col items-center z-20 transition-all duration-200">
                     {/* Slot Kertas Keluar */}
                     <div className="w-full h-4 bg-[#10241B] rounded-full mb-3 flex items-center justify-center">
-                      <div className="w-2/3 h-1 bg-[#19C37D]/30 rounded-full"></div>
+                      <div
+                        className={`h-1 bg-[#19C37D]/50 rounded-full transition-all duration-300 ${
+                          cleanUsername ? "w-4/5 bg-[#FFE45C]" : "w-2/3"
+                        }`}
+                      ></div>
                     </div>
                     {/* Panel Depan Printer */}
                     <div className="w-full flex items-center justify-between px-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-3.5 h-3.5 rounded-full bg-white border border-[#10241B] flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#087443] animate-pulse"></div>
+                        <div className="w-3.5 h-3.5 rounded-full bg-white border border-[#10241B] flex items-center justify-center shadow-xs">
+                          <div
+                            className={`rounded-full transition-all duration-300 ${
+                              loading
+                                ? "w-2 h-2 bg-[#FFE45C] animate-spin"
+                                : isValidUsername
+                                ? "w-2 h-2 bg-[#087443] shadow-[0_0_6px_#10241B] animate-ping"
+                                : cleanUsername
+                                ? "w-2 h-2 bg-[#FFE45C] animate-pulse"
+                                : "w-1.5 h-1.5 bg-[#087443] animate-pulse"
+                            }`}
+                          ></div>
                         </div>
                         <div className="flex flex-col text-left leading-none">
                           <span className="font-display text-[11px] font-extrabold tracking-tight text-[#10241B]">
                             WERT PRINT ENGINE
                           </span>
-                          <span className="text-[9px] font-medium text-[#10241B]/80 font-mono mt-0.5">
-                            READY // HIGH-SPEED
+                          <span className="text-[9px] font-semibold text-[#10241B]/80 font-mono mt-0.5">
+                            {loading
+                              ? "MENGHUBUNGKAN..."
+                              : isValidUsername
+                              ? "ROOM SIAP // ENTER ↵"
+                              : cleanUsername
+                              ? `MENGETIK (${cleanUsername.length}/3)`
+                              : "STANDBY // READY"}
                           </span>
                         </div>
                       </div>
                       {/* Status Display Mini */}
-                      <div className="bg-[#087443] text-white px-2.5 py-1 rounded-lg border border-[#10241B] flex items-center gap-1">
+                      <div
+                        className={`text-white px-2.5 py-1 rounded-lg border border-[#10241B] flex items-center gap-1 transition-all ${
+                          isValidUsername
+                            ? "bg-[#FFE45C] text-[#10241B] font-extrabold shadow-xs"
+                            : "bg-[#087443]"
+                        }`}
+                      >
                         <Zap className="w-3.5 h-3.5" />
-                        <span className="font-display font-bold text-[11px]">AUTO-PULL</span>
+                        <span className="font-display font-bold text-[11px]">
+                          {isValidUsername ? "BUKA ➔" : "AUTO-PULL"}
+                        </span>
                       </div>
                     </div>
                     <div className="w-32 h-1.5 bg-[#10241B]/20 rounded-full mt-2.5"></div>
@@ -548,7 +630,7 @@ export default function HomePage() {
                     <Clock className="w-6 h-6" />
                   </div>
                   <div className="flex flex-col">
-                    <h3 className="font-display text-[17px] font-bold text-[#10241B]">Hapus otomatis 48 jam</h3>
+                    <h3 className="font-display text-[17px] font-bold text-[#10241B]">Hapus otomatis 24 jam</h3>
                     <p className="text-sm text-[#587063] mt-0.5">File tugasmu tidak menumpuk di PC fotokopi.</p>
                   </div>
                 </div>

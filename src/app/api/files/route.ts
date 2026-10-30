@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getFileKind, sanitizeFilename } from "@/lib/utils";
+import { purgeExpiredFiles } from "@/lib/storage/purge";
 
 // Supported file extensions
 const ALLOWED_EXTS = new Set(["docx", "pdf", "xlsx", "pptx", "jpg", "jpeg", "png", "heic", "zip"]);
@@ -17,6 +18,9 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Sesi tidak valid." }, { status: 401 });
     }
+
+    // Lazy cleanup: purge any expired files for this user in background
+    purgeExpiredFiles({ userId: session.userId }).catch(() => {});
 
     const now = new Date().toISOString();
 
@@ -58,11 +62,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ukuran file melebihi batas 50 MB." }, { status: 400 });
     }
 
-    // Check user file count
+    // Lazy cleanup: purge any expired files for this user immediately
+    await purgeExpiredFiles({ userId: session.userId }).catch(() => {});
+
+    // Check user active file count
+    const now = new Date().toISOString();
     const { count } = await supabaseAdmin
       .from("files")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", session.userId);
+      .eq("user_id", session.userId)
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
 
     if ((count || 0) >= MAX_FILES_PER_USER) {
       return NextResponse.json({ error: "Batas maksimum 20 file per akun telah tercapai." }, { status: 400 });
@@ -101,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Determine auto-delete expires_at
     const expiresAt = session.autoDeleteEnabled
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       : null;
 
     // Insert file record

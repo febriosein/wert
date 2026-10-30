@@ -78,7 +78,7 @@ export default function SettingsPage({ params }: PageProps) {
     const newStatus = !data.autoDeleteEnabled;
 
     if (newStatus) {
-      if (!confirm("Nyalakan kembali hapus otomatis? Timer 48 jam seluruh file Anda akan dihitung ulang dari saat ini.")) {
+      if (!confirm("Nyalakan kembali hapus otomatis? Timer 24 jam seluruh file Anda akan dihitung ulang dari saat ini.")) {
         return;
       }
     }
@@ -91,7 +91,7 @@ export default function SettingsPage({ params }: PageProps) {
 
     setSuccessMsg(
       newStatus
-        ? "Pengaturan disimpan: Hapus otomatis 48 jam aktif."
+        ? "Pengaturan disimpan: Hapus otomatis 24 jam aktif."
         : "Pengaturan disimpan: Hapus otomatis dimatikan."
     );
     setTimeout(() => setSuccessMsg(null), 3000);
@@ -198,7 +198,7 @@ export default function SettingsPage({ params }: PageProps) {
   };
 
   const fileCountPercent = Math.min(100, Math.round(((data?.filesCount || 0) / (data?.maxFiles || 20)) * 100));
-  const storagePercent = Math.min(100, Math.round(((data?.totalSizeBytes || 0) / (data?.maxSizeBytes || 200 * 1024 * 1024)) * 100));
+  const storagePercent = Math.min(100, Math.round(((data?.totalSizeBytes || 0) / (data?.maxSizeBytes || 100 * 1024 * 1024)) * 100));
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
@@ -416,10 +416,10 @@ export default function SettingsPage({ params }: PageProps) {
                   </div>
                   <div>
                     <h2 className="font-display font-bold text-lg text-[#10241B]">
-                      Hapus otomatis setelah 48 jam
+                      Hapus otomatis setelah 24 jam
                     </h2>
                     <p className="text-xs text-[#587063] mt-1 max-w-md">
-                      File baru akan dihapus otomatis setelah 48 jam. Bisa diubah per file saat diunggah.
+                      File baru akan dihapus otomatis setelah 24 jam. Bisa diubah per file saat diunggah.
                     </p>
                   </div>
                 </div>
@@ -498,7 +498,7 @@ export default function SettingsPage({ params }: PageProps) {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-5">
                     <span className="font-display font-bold text-base text-[#10241B]">
-                      {formatBytes(data?.totalSizeBytes || 0)} <span className="text-xs text-[#587063] font-normal">dari {formatBytes(data?.maxSizeBytes || 200 * 1024 * 1024)}</span>
+                      {formatBytes(data?.totalSizeBytes || 0)} <span className="text-xs text-[#587063] font-normal">dari {formatBytes(data?.maxSizeBytes || 100 * 1024 * 1024)}</span>
                     </span>
                     <div className="flex items-center gap-2">
                       <div className="w-28 sm:w-36 h-2 rounded-full bg-[#D5EADF] overflow-hidden">
