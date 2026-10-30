@@ -44,7 +44,7 @@ export default function MobileUploadPage({ params }: PageProps) {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
+    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] overflow-x-hidden selection:bg-[#E3F8EC] selection:text-[#087443]">
       {/* Mobile Header */}
       <header className="p-4 border-b border-[#D5EADF] bg-white/90 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-2.5">

@@ -334,7 +334,7 @@ export default function UserDashboardPage({ params }: PageProps) {
   const isStorageCritical = storagePercent >= 95;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
+    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] overflow-x-hidden selection:bg-[#E3F8EC] selection:text-[#087443]">
       <Navbar username={username} />
 
       <main className="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -371,16 +371,16 @@ export default function UserDashboardPage({ params }: PageProps) {
                   File tugasmu
                 </h1>
                 <p className="text-sm text-[#587063] mt-1">
-                  <span className="hidden sm:inline">Belum ada file. Tarik file ke sini, atau scan QR dari HP.</span>
-                  <span className="sm:hidden">Belum ada file. Ketuk &apos;Tambah file&apos; untuk mulai mengunggah.</span>
+                  <span className="hidden lg:inline">Belum ada file. Tarik file ke sini, atau scan QR dari HP.</span>
+                  <span className="lg:hidden">Belum ada file. Ketuk &apos;Tambah file&apos; untuk mulai mengunggah.</span>
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="hidden sm:flex px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden lg:flex px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
@@ -389,7 +389,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setShowAddFile(true)}
-                  className="px-5 py-2.5 rounded-[14px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-[14px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>
@@ -484,11 +484,11 @@ export default function UserDashboardPage({ params }: PageProps) {
               </div>
 
               {/* Action Buttons: Tambah File (Sticker Style) */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="hidden sm:flex px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden lg:flex px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
@@ -497,7 +497,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setShowAddFile(!showAddFile)}
-                  className="px-5 py-3 rounded-[16px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-[16px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>

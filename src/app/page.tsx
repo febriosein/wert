@@ -286,10 +286,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] selection:bg-[#E3F8EC] selection:text-[#087443]">
+    <div className="min-h-screen flex flex-col bg-[#F4FBF7] text-[#10241B] overflow-x-hidden selection:bg-[#E3F8EC] selection:text-[#087443]">
       <Navbar />
 
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 w-full max-w-full overflow-x-hidden">
         {/* STEP 1: BERANDA DUA KOLOM DENGAN ILUSTRASI PRINTER */}
         {step === "username" && (
           <div className="w-full max-w-[1120px] mx-auto flex flex-col gap-10 md:gap-14 py-4 md:py-8">
@@ -643,12 +643,14 @@ export default function HomePage() {
 
         {/* STEP 2: PIN PROMPT (MODERN DISCRETE 4-DIGIT BOXES) */}
         {step === "pin_prompt" && (
-          <div className="relative w-full max-w-[480px] mx-auto py-6">
-            {/* Ambient Blobs */}
-            <div className="absolute -top-12 -left-16 w-72 h-72 rounded-full bg-[#19C37D]/15 blur-3xl pointer-events-none"></div>
-            <div className="absolute top-24 -right-16 w-80 h-80 rounded-full bg-[#FFE45C]/20 blur-3xl pointer-events-none"></div>
+          <div className="relative w-full max-w-[420px] mx-auto py-4 sm:py-8 px-2 sm:px-0">
+            {/* Ambient Blobs (contained so they NEVER bleed outside or cause horizontal scroll) */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 rounded-[32px]">
+              <div className="absolute -top-12 -left-16 w-72 h-72 rounded-full bg-[#19C37D]/15 blur-3xl"></div>
+              <div className="absolute top-24 -right-16 w-80 h-80 rounded-full bg-[#FFE45C]/20 blur-3xl"></div>
+            </div>
 
-            <div className="relative w-full bg-white rounded-[28px] p-6 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col items-center text-center">
+            <div className="relative w-full bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col items-center text-center">
               {/* Top Lock Icon Tile */}
               <div className="w-14 h-14 rounded-2xl bg-[#E3F8EC] flex items-center justify-center text-[#087443] mb-4 shadow-sm border border-[#D5EADF]">
                 <Lock className="w-7 h-7" />
@@ -688,7 +690,7 @@ export default function HomePage() {
                         onChange={(e) => handleDigitChange(idx, e.target.value)}
                         onKeyDown={(e) => handleDigitKeyDown(idx, e)}
                         onPaste={handleDigitPaste}
-                        className="w-full h-full text-center bg-transparent text-2xl sm:text-3xl font-display font-extrabold text-[#10241B] outline-none select-none caret-[#087443]"
+                        className="w-full text-center bg-transparent text-2xl sm:text-3xl font-display font-extrabold text-[#10241B] outline-none select-none caret-[#087443] py-2"
                       />
                     </div>
                   ))}
@@ -745,8 +747,8 @@ export default function HomePage() {
 
         {/* STEP 3: REGISTER PROMPT (NEW ACCOUNT) */}
         {step === "register_prompt" && !newRecoveryCode && (
-          <div className="relative w-full max-w-[480px] mx-auto py-6">
-            <div className="w-full bg-white rounded-[28px] p-6 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col items-center text-center">
+          <div className="relative w-full max-w-[420px] mx-auto py-4 sm:py-8 px-2 sm:px-0">
+            <div className="w-full bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded-2xl bg-[#E3F8EC] text-[#087443] flex items-center justify-center mb-4 border border-[#D5EADF] shadow-sm">
                 <ShieldCheck className="w-7 h-7" />
               </div>
@@ -857,8 +859,8 @@ export default function HomePage() {
 
         {/* STEP 5: RECOVERY PROMPT */}
         {step === "recovery_prompt" && (
-          <div className="relative w-full max-w-[480px] mx-auto py-6">
-            <div className="w-full bg-white rounded-[28px] p-6 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col text-left">
+          <div className="relative w-full max-w-[420px] mx-auto py-4 sm:py-8 px-2 sm:px-0">
+            <div className="w-full bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 shadow-soft border border-[#D5EADF] flex flex-col text-left">
               <div className="text-center mb-4">
                 <h3 className="font-display text-xl font-bold text-[#10241B]">Pemulihan PIN</h3>
                 <p className="text-xs text-[#587063] mt-1">

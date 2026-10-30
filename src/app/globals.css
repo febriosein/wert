@@ -39,13 +39,20 @@
 html {
   color-scheme: light !important;
   background-color: #F4FBF7 !important;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
 }
 
 body {
   color-scheme: light !important;
   background-color: #F4FBF7 !important;
   color: #10241B !important;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
   font-family: var(--font-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Explicit Utility Classes to guarantee 100% reliable rendering */
