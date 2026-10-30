@@ -2,6 +2,7 @@
 
 import { useState, useRef, FormEvent, ClipboardEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Printer,
   ArrowRight,
@@ -645,9 +646,15 @@ export default function HomePage() {
                 <span>Solusi cetak file tugas cepat & privat untuk pelajar dan fotokopian.</span>
               </div>
               <div className="flex items-center gap-4 font-medium">
-                <a href="#" className="hover:text-[#087443] transition">Kebijakan Privasi</a>
-                <a href="#" className="hover:text-[#087443] transition">Syarat & Ketentuan</a>
-                <a href="#" className="hover:text-[#087443] transition">Bantuan</a>
+                <Link href="/privacy" className="hover:text-[#087443] transition">
+                  Kebijakan Privasi
+                </Link>
+                <Link href="/terms" className="hover:text-[#087443] transition">
+                  Syarat & Ketentuan
+                </Link>
+                <Link href="/bantuan" className="hover:text-[#087443] transition">
+                  Bantuan
+                </Link>
               </div>
             </footer>
           </div>

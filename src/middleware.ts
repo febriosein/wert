@@ -39,7 +39,9 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/favicon.ico") ||
     pathname === "/" ||
     pathname === "/privacy" ||
-    pathname === "/terms";
+    pathname === "/terms" ||
+    pathname === "/bantuan" ||
+    pathname === "/help";
 
   if (!isPublicStatic) {
     response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0");
