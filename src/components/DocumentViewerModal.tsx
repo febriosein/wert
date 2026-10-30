@@ -22,7 +22,6 @@ import {
 import { FileItem } from "./FileCard";
 import { useRouter } from "next/navigation";
 import { formatBytes } from "@/lib/utils";
-import { sound } from "@/lib/audio";
 
 interface DocumentViewerModalProps {
   file: FileItem | null;
@@ -116,7 +115,6 @@ export function DocumentViewerModal({ file, onClose }: DocumentViewerModalProps)
   if (!file) return null;
 
   const handlePrint = () => {
-    sound.playPaperSlide();
     setPrinting(true);
     const targetUrl = previewUrl;
 

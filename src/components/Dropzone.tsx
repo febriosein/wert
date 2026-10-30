@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { validateMagicBytes } from "@/lib/storage/validator";
-import { sound } from "@/lib/audio";
 
 interface UploadingFile {
   id: string;
@@ -132,7 +131,6 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId, initialFiles }
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
-        sound.playSuccess();
         onUploadSuccess();
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -162,7 +160,6 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId, initialFiles }
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
-        sound.playSuccess();
         onUploadSuccess();
       } else {
         // Direct Signed URL route for zero Vercel payload limit issues
@@ -243,7 +240,6 @@ export function Dropzone({ onUploadSuccess, token, replaceFileId, initialFiles }
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, progress: 100, status: "done" } : i))
         );
-        sound.playSuccess();
         onUploadSuccess();
       }
     } catch (err: any) {

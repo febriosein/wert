@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { QrCode, Settings, LogOut, Printer, Volume2, VolumeX } from "lucide-react";
-import { useState, useEffect } from "react";
-import { sound } from "@/lib/audio";
+import { QrCode, Settings, LogOut, Printer } from "lucide-react";
+import { useState } from "react";
 
 interface NavbarProps {
   username?: string;
@@ -15,17 +14,6 @@ interface NavbarProps {
 export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-
-  useEffect(() => {
-    setSoundEnabled(sound.getEnabled());
-  }, []);
-
-  const handleToggleSound = () => {
-    const next = sound.toggle();
-    setSoundEnabled(next);
-    if (next) sound.playClick();
-  };
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -82,21 +70,6 @@ export function Navbar({ username, onOpenQr, showActions = true }: NavbarProps) 
                 <span className="hidden md:inline">Upload dari HP</span>
               </button>
             )}
-
-            {/* Audio Feedback Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleSound}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer"
-              title={soundEnabled ? "Matikan Efek Suara Taktil" : "Nyalakan Efek Suara Taktil"}
-              aria-label="Toggle Audio"
-            >
-              {soundEnabled ? (
-                <Volume2 className="w-4 h-4 text-[#087443]" />
-              ) : (
-                <VolumeX className="w-4 h-4 text-slate-400" />
-              )}
-            </button>
 
             {/* Ikon Pengaturan */}
             <Link
