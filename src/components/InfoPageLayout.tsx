@@ -86,6 +86,11 @@ export function InfoPageLayout({ title, subtitle, badge = "Informasi & Panduan",
       <footer className="w-full border-t border-[#D5EADF] py-8 text-center text-xs text-[#587063] bg-white/50 backdrop-blur-xs mt-12">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
+            <img
+              src="/logo-transparent.png"
+              alt="Logo wert.web.id"
+              className="w-5 h-5 object-contain"
+            />
             <span className="font-display font-bold text-[#10241B]">wert.web.id</span>
             <span>•</span>
             <span>Cetak tugas cepat tanpa WhatsApp</span>

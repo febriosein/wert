@@ -4,7 +4,6 @@ import { useState, useRef, FormEvent, ClipboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Printer,
   ArrowRight,
   ShieldCheck,
   Clock,
@@ -580,8 +579,12 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#D5EADF]">
                 {/* Item 1: Printer Hijau */}
                 <div className="flex items-start gap-4 p-3 md:px-5 md:py-2 first:pt-0 md:first:pt-2">
-                  <div className="w-12 h-12 rounded-xl bg-[#E3F8EC] flex items-center justify-center flex-shrink-0 text-[#087443] shadow-sm">
-                    <Printer className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-xl bg-[#E3F8EC] flex items-center justify-center flex-shrink-0 text-[#087443] shadow-sm p-2">
+                    <img
+                      src="/logo-transparent.png"
+                      alt="Logo wert.web.id"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5">
@@ -621,7 +624,12 @@ export default function HomePage() {
 
             {/* Footer Mini Penjelas */}
             <footer className="w-full border-t border-[#D5EADF] pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#587063]">
-              <div className="flex items-center gap-1.5 text-center sm:text-left">
+              <div className="flex items-center gap-2 text-center sm:text-left">
+                <img
+                  src="/logo-transparent.png"
+                  alt="Logo wert.web.id"
+                  className="w-5 h-5 object-contain"
+                />
                 <span>© 2026 wert.web.id</span>
                 <span className="hidden sm:inline">•</span>
                 <span>Solusi cetak file tugas cepat & privat untuk pelajar dan fotokopian.</span>

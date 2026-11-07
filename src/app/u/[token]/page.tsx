@@ -2,7 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import { Dropzone } from "@/components/Dropzone";
-import { Printer, CheckCircle, AlertCircle, RefreshCw, Smartphone, Monitor } from "lucide-react";
+import { CheckCircle, AlertCircle, RefreshCw, Smartphone, Monitor } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ token: string }>;
@@ -48,8 +48,12 @@ export default function MobileUploadPage({ params }: PageProps) {
       {/* Mobile Header */}
       <header className="p-4 border-b border-[#D5EADF] bg-white/90 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#087443] flex items-center justify-center text-white font-bold border-2 border-[#10241B] shadow-sticker-sm">
-            <Printer className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold border-2 border-[#10241B] shadow-sticker-sm overflow-hidden p-0.5">
+            <img
+              src="/logo-transparent.png"
+              alt="Logo wert.web.id"
+              className="w-full h-full object-contain"
+            />
           </div>
           <span className="font-display font-extrabold text-lg tracking-tight text-[#10241B]">
             wert<span className="text-[#087443]">.web.id</span>

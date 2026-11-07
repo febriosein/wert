@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Settings, LogOut, Printer } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { useState } from "react";
 
 interface NavbarProps {
@@ -32,9 +32,13 @@ export function Navbar({ username, showActions = true }: NavbarProps) {
       <div className="max-w-[1120px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
         <Link href={username ? `/${username}` : "/"} prefetch={true} className="flex items-center gap-3 group">
-          {/* Logo Kotak Hijau 40x40 bergaya stiker */}
-          <div className="w-10 h-10 rounded-xl bg-[#087443] flex items-center justify-center text-white border-2 border-[#10241B] shadow-sticker-sm flex-shrink-0 transition-transform group-hover:-translate-y-0.5">
-            <Printer className="w-5 h-5" />
+          {/* Logo Wert 40x40 bergaya stiker */}
+          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border-2 border-[#10241B] shadow-sticker-sm flex-shrink-0 transition-transform group-hover:-translate-y-0.5 overflow-hidden p-0.5">
+            <img
+              src="/logo-transparent.png"
+              alt="Logo wert.web.id"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div className="flex flex-col leading-none">
             <div className="flex items-center gap-1.5">

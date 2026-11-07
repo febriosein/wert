@@ -17,6 +17,15 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "wert.web.id - Kirim file, langsung cetak",
   description: "Buka halaman tugasmu dan tunjukkan ke tukang fotokopi. Tanpa chat WhatsApp.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

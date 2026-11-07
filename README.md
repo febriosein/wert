@@ -1,4 +1,4 @@
-# <p align="center"><img src="public/favicon.ico" width="48" height="48" alt="Wert Logo" style="vertical-align: middle;" /> <b>wert.web.id</b></p>
+# <p align="center"><img src="public/logo.png" width="52" height="52" alt="Wert Logo" style="vertical-align: middle; border-radius: 12px;" /> <b>wert.web.id</b></p>
 
 <h3 align="center">Akses, Pratinjau, dan Cetak Dokumen Tugas dari Mana Saja — Tanpa Perlu Login WhatsApp di Komputer Fotokopian</h3>
 
