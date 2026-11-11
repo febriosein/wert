@@ -95,7 +95,7 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
       ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       : null;
 
-    const baseRecord: Record<string, any> = {
+    const record: Record<string, any> = {
       id: fileId,
       user_id: user.id,
       display_name: title,
@@ -103,36 +103,16 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
       mime: "text/uri-list",
       size_bytes: 0,
       storage_key: storageKey,
+      kind: "document",
       status: "ready",
       expires_at: expiresAt,
     };
 
-    // Attempt 1: Try with kind='link' and url=normalizedUrl
-    let { data: newFile, error: insertError } = await supabaseAdmin
+    const { data: newFile, error: insertError } = await supabaseAdmin
       .from("files")
-      .insert({
-        ...baseRecord,
-        kind: "link",
-        url: normalizedUrl,
-      })
+      .insert(record)
       .select("*")
       .single();
-
-    // Attempt 2: Fallback if column/constraint not yet migrated
-    if (insertError) {
-      const fallbackKind = insertError.message.includes("files_kind_check") ? "document" : "link";
-      const res = await supabaseAdmin
-        .from("files")
-        .insert({
-          ...baseRecord,
-          kind: fallbackKind,
-        })
-        .select("*")
-        .single();
-
-      newFile = res.data;
-      insertError = res.error;
-    }
 
     if (insertError || !newFile) {
       return NextResponse.json(
@@ -151,7 +131,7 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
       success: true,
       file: {
         ...newFile,
-        url: newFile.url || normalizedUrl,
+        url: normalizedUrl,
       },
     });
   } catch (err: any) {
