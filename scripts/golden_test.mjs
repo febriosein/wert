@@ -11,6 +11,7 @@ import { readZipCentralDirectory } from "../src/lib/storage/zip-reader.ts";
 import { validateMagicBytes } from "../src/lib/storage/validator.ts";
 import { generateRecoveryCode } from "../src/lib/utils.ts";
 import { isValidWebUrl, normalizeUrl, getLinkPlatformInfo, getDefaultLinkTitle } from "../src/lib/links.ts";
+import { CONVERT_TO_PDF_TOOLS, CONVERT_FROM_PDF_TOOLS, EXTRA_PDF_TOOLS } from "../src/lib/pdf-tools.ts";
 
 let passedCount = 0;
 let failedCount = 0;
@@ -159,6 +160,22 @@ async function runGoldenTests() {
 
   assert(getDefaultLinkTitle("https://drive.google.com/file/d/123") === "Tautan Google Drive", "Generates friendly default title for Google Drive");
   assert(getDefaultLinkTitle("https://canva.com/design/123") === "Desain Canva", "Generates friendly default title for Canva");
+
+  // 5. ILOVEPDF CONVERSION CATALOG INTEGRITY
+  console.log("\n[5] Testing iLovePDF Conversion Tools Catalog:");
+  assert(CONVERT_TO_PDF_TOOLS.length === 5, "Catalog has 5 Convert to PDF tools");
+  assert(CONVERT_FROM_PDF_TOOLS.length === 5, "Catalog has 5 Convert from PDF tools");
+  assert(EXTRA_PDF_TOOLS.length === 2, "Catalog has 2 popular extra PDF tools");
+
+  const allTools = [...CONVERT_TO_PDF_TOOLS, ...CONVERT_FROM_PDF_TOOLS, ...EXTRA_PDF_TOOLS];
+  const allUrlsValid = allTools.every((t) => t.url.startsWith("https://www.ilovepdf.com/id/"));
+  assert(allUrlsValid, "All tools link to secure Indonesian iLovePDF endpoints (https://www.ilovepdf.com/id/...)");
+
+  const wordToPdf = CONVERT_TO_PDF_TOOLS.find((t) => t.id === "word-to-pdf");
+  assert(wordToPdf && wordToPdf.formatFrom === "DOCX" && wordToPdf.formatTo === "PDF", "Word to PDF tool properly configured");
+
+  const pdfToWord = CONVERT_FROM_PDF_TOOLS.find((t) => t.id === "pdf-to-word");
+  assert(pdfToWord && pdfToWord.formatFrom === "PDF" && pdfToWord.formatTo === "DOCX", "PDF to Word tool properly configured");
 
   console.log("\n==================================================");
   console.log(`RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);

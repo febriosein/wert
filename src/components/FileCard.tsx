@@ -369,17 +369,105 @@ export function FileCard({
                         </button>
                       </>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowMenu(false);
-                          setShowReplaceModal(true);
-                        }}
-                        className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Ganti File (Update)</span>
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowMenu(false);
+                            setShowReplaceModal(true);
+                          }}
+                          className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Ganti File (Update)</span>
+                        </button>
+
+                        {/* Contextual iLovePDF Conversion Shortcuts */}
+                        {["docx", "doc"].includes(cleanExt) && (
+                          <a
+                            href="https://www.ilovepdf.com/id/word-ke-pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowMenu(false)}
+                            className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center justify-between font-medium cursor-pointer text-[#1D4ED8]"
+                            title="Konversi dokumen Word ini ke PDF via iLovePDF"
+                          >
+                            <span className="flex items-center gap-2">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Ubah ke PDF (iLovePDF)</span>
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#8AA095]" />
+                          </a>
+                        )}
+
+                        {cleanExt === "pdf" && (
+                          <a
+                            href="https://www.ilovepdf.com/id/pdf-ke-word"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowMenu(false)}
+                            className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center justify-between font-medium cursor-pointer text-[#1D4ED8]"
+                            title="Ekstrak PDF ini kembali ke Word via iLovePDF"
+                          >
+                            <span className="flex items-center gap-2">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Ubah ke Word (iLovePDF)</span>
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#8AA095]" />
+                          </a>
+                        )}
+
+                        {["jpg", "jpeg", "png", "heic", "webp"].includes(cleanExt) && (
+                          <a
+                            href="https://www.ilovepdf.com/id/jpg-ke-pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowMenu(false)}
+                            className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center justify-between font-medium cursor-pointer text-[#B45309]"
+                            title="Ubah gambar ini menjadi PDF via iLovePDF"
+                          >
+                            <span className="flex items-center gap-2">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Ubah ke PDF (iLovePDF)</span>
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#8AA095]" />
+                          </a>
+                        )}
+
+                        {["pptx", "ppt"].includes(cleanExt) && (
+                          <a
+                            href="https://www.ilovepdf.com/id/powerpoint-ke-pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowMenu(false)}
+                            className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center justify-between font-medium cursor-pointer text-[#A4510A]"
+                            title="Konversi slide PowerPoint ini ke PDF via iLovePDF"
+                          >
+                            <span className="flex items-center gap-2">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Ubah ke PDF (iLovePDF)</span>
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#8AA095]" />
+                          </a>
+                        )}
+
+                        {["xlsx", "xls"].includes(cleanExt) && (
+                          <a
+                            href="https://www.ilovepdf.com/id/excel-ke-pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setShowMenu(false)}
+                            className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center justify-between font-medium cursor-pointer text-[#087443]"
+                            title="Konversi tabel Excel ini ke PDF via iLovePDF"
+                          >
+                            <span className="flex items-center gap-2">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Ubah ke PDF (iLovePDF)</span>
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#8AA095]" />
+                          </a>
+                        )}
+                      </>
                     )}
 
                     {file.expires_at && (

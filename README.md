@@ -155,6 +155,12 @@ graph TD
 - **Pemeriksa Arsip ZIP Tanpa Ekstraksi (*Zero-Extraction*)**: Membaca *Central Directory* ZIP secara aman tanpa mengekstrak isinya ke disk, mencegah serangan *Zip Slip* atau *Zip Bomb*.
 - **Tombol Cetak Cepat 1-Klik**: Membuka dialog print browser dalam tata letak yang siap cetak.
 
+### 🔄 Pusat Konversi Dokumen (Integrasi iLovePDF)
+- **Menu Konversi di Seluruh Halaman**: Tombol *"Konversi PDF"* di Navbar membuka katalog 10+ alat konversi terpercaya iLovePDF versi Bahasa Indonesia.
+- **Convert to PDF**: Word ke PDF (mencegah tata letak rusak), JPG ke PDF, PowerPoint ke PDF, Excel ke PDF, dan HTML ke PDF.
+- **Convert from PDF**: PDF ke Word (koreksi typo mendadak), PDF ke JPG, PDF ke PowerPoint, PDF ke Excel, dan PDF ke PDF/A.
+- **Pintasan Kontekstual File**: Kartu dokumen Word/Excel/PPT/Gambar langsung menyediakan shortcut konversi ke PDF di menu opsi `⋮` tanpa perlu mencari alat secara manual.
+
 ### 🔒 Proteksi Khusus Komputer Rental
 - **Header Anti-Cache Ketat**: Menghindari file tersimpan di cache disk browser umum dengan header:
   ```http

@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import { PdfToolsModal } from "@/components/PdfToolsModal";
 
 interface NavbarProps {
   username?: string;
@@ -13,6 +14,7 @@ interface NavbarProps {
 export function Navbar({ username, showActions = true }: NavbarProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showPdfTools, setShowPdfTools] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -52,39 +54,58 @@ export function Navbar({ username, showActions = true }: NavbarProps) {
           </div>
         </Link>
 
-        {/* User Context & Actions */}
-        {username && showActions && (
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Chip @nama */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E3F8EC] text-[#087443] border border-[#D5EADF]">
-              <span className="w-2 h-2 rounded-full bg-[#19C37D] animate-pulse"></span>
-              @{username}
-            </span>
+        {/* Right Actions: PDF Tools + User Context */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Tombol Konversi PDF (iLovePDF) */}
+          <button
+            type="button"
+            onClick={() => setShowPdfTools(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#E3F8EC] hover:bg-[#d5f3e2] text-[#087443] border border-[#19C37D]/30 transition cursor-pointer shadow-2xs"
+            title="Pusat Konversi Dokumen via iLovePDF (Word, JPG, Excel, dll.)"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-[#087443]" />
+            <span>Konversi PDF</span>
+          </button>
 
-            {/* Ikon Pengaturan */}
-            <Link
-              href={`/${username}/settings`}
-              prefetch={true}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition"
-              title="Pengaturan akun & PIN"
-            >
-              <Settings className="w-4 h-4" />
-            </Link>
+          {username && showActions && (
+            <>
+              {/* Chip @nama */}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E3F8EC] text-[#087443] border border-[#D5EADF]">
+                <span className="w-2 h-2 rounded-full bg-[#19C37D] animate-pulse"></span>
+                @{username}
+              </span>
 
-            {/* Tombol Keluar */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#D92D3A] hover:bg-[#FFEAEC] transition cursor-pointer"
-              title="Keluar dari sesi ini"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Keluar</span>
-            </button>
-          </div>
-        )}
+              {/* Ikon Pengaturan */}
+              <Link
+                href={`/${username}/settings`}
+                prefetch={true}
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition"
+                title="Pengaturan akun & PIN"
+              >
+                <Settings className="w-4 h-4" />
+              </Link>
+
+              {/* Tombol Keluar */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#D92D3A] hover:bg-[#FFEAEC] transition cursor-pointer"
+                title="Keluar dari sesi ini"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Keluar</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
+
+      {/* Modal Pusat Konversi Dokumen (iLovePDF) */}
+      <PdfToolsModal
+        isOpen={showPdfTools}
+        onClose={() => setShowPdfTools(false)}
+      />
     </header>
   );
 }
