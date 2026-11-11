@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   ExternalLink,
-  ArrowRight,
   Sparkles,
   FileText,
   FileSpreadsheet,
   Presentation,
   Image as ImageIcon,
   Globe,
-  Archive,
   Layers,
   Minimize2,
   RefreshCw,
@@ -29,9 +28,32 @@ interface PdfToolsModalProps {
 }
 
 export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [mobileTab, setMobileTab] = useState<"to_pdf" | "from_pdf" | "extra">("to_pdf");
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Keyboard shortcut Escape & body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen || !mounted) return null;
 
   const renderToolIcon = (format: string, color: string) => {
     const f = format.toLowerCase();
@@ -65,9 +87,9 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
       href={tool.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative bg-[#F4FBF7]/60 hover:bg-white rounded-2xl border border-[#D5EADF] hover:border-[#087443] p-3.5 sm:p-4 flex items-start gap-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
+      className="group relative bg-[#F4FBF7]/80 hover:bg-white rounded-2xl border border-[#D5EADF] hover:border-[#087443] p-3 sm:p-3.5 flex items-start gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-xs"
     >
-      <div className="w-10 h-10 rounded-xl bg-white border border-[#D5EADF] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-[#D5EADF] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
         {renderToolIcon(tool.formatFrom, tool.accentColor)}
       </div>
 
@@ -86,16 +108,16 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
           <ExternalLink className="w-3.5 h-3.5 text-[#8AA095] group-hover:text-[#087443] shrink-0 transition-colors" />
         </div>
 
-        <p className="text-[11px] text-[#587063] mt-1 leading-snug line-clamp-2">
+        <p className="text-[11px] text-[#587063] mt-0.5 leading-snug line-clamp-1 sm:line-clamp-2">
           {tool.description}
         </p>
 
-        <div className="flex items-center gap-1 mt-2 text-[10px] font-mono font-bold text-[#8AA095]">
-          <span className={`px-1.5 py-0.5 rounded ${tool.badgeBg} ${tool.badgeText}`}>
+        <div className="flex items-center gap-1 mt-1.5 text-[9px] sm:text-[10px] font-mono font-bold text-[#8AA095]">
+          <span className={`px-1.5 py-0.2 rounded ${tool.badgeBg} ${tool.badgeText}`}>
             {tool.formatFrom}
           </span>
           <span>→</span>
-          <span className="px-1.5 py-0.5 rounded bg-[#FFEAE7] text-[#B4232E]">
+          <span className="px-1.5 py-0.2 rounded bg-[#FFEAE7] text-[#B4232E]">
             {tool.formatTo}
           </span>
         </div>
@@ -103,27 +125,32 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
     </a>
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#10241B]/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-4xl max-h-[90vh] rounded-[28px] bg-white p-5 sm:p-7 shadow-2xl border border-[#D5EADF] flex flex-col text-left overflow-hidden">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-[#10241B]/60 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-4xl max-h-[88vh] my-auto rounded-[28px] bg-white p-4 sm:p-6 shadow-2xl border-2 border-[#10241B] flex flex-col text-left overflow-hidden animate-in zoom-in-95 duration-150">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer z-10"
+          className="absolute top-4 right-4 p-2 rounded-xl text-[#587063] hover:text-[#10241B] hover:bg-[#E3F8EC] transition cursor-pointer z-20"
           aria-label="Tutup menu konversi"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3.5 mb-5 pr-10">
-          <div className="w-12 h-12 rounded-2xl bg-[#E3F8EC] flex items-center justify-center text-[#087443] border border-[#D5EADF] shadow-sm shrink-0">
-            <RefreshCw className="w-6 h-6" />
+        <div className="flex items-center gap-3 sm:gap-3.5 mb-4 pr-10 shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#E3F8EC] flex items-center justify-center text-[#087443] border border-[#D5EADF] shadow-sm shrink-0">
+            <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-display text-xl sm:text-2xl font-extrabold text-[#10241B]">
+              <h2 className="font-display text-lg sm:text-2xl font-extrabold text-[#10241B]">
                 Pusat Konversi Dokumen
               </h2>
               <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-[#E3F8EC] text-[#087443] text-[10px] font-bold border border-[#D5EADF]">
@@ -137,11 +164,11 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
         </div>
 
         {/* Mobile Tab Switcher */}
-        <div className="grid grid-cols-3 md:hidden p-1 rounded-xl bg-[#F4FBF7] border border-[#D5EADF] gap-1 mb-4 text-xs font-bold">
+        <div className="grid grid-cols-3 md:hidden p-1 rounded-xl bg-[#F4FBF7] border border-[#D5EADF] gap-1 mb-3 text-xs font-bold shrink-0">
           <button
             type="button"
             onClick={() => setMobileTab("to_pdf")}
-            className={`py-2 rounded-lg transition ${
+            className={`py-1.5 rounded-lg transition ${
               mobileTab === "to_pdf"
                 ? "bg-white text-[#087443] shadow-xs"
                 : "text-[#587063]"
@@ -152,7 +179,7 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
           <button
             type="button"
             onClick={() => setMobileTab("from_pdf")}
-            className={`py-2 rounded-lg transition ${
+            className={`py-1.5 rounded-lg transition ${
               mobileTab === "from_pdf"
                 ? "bg-white text-[#087443] shadow-xs"
                 : "text-[#587063]"
@@ -163,7 +190,7 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
           <button
             type="button"
             onClick={() => setMobileTab("extra")}
-            className={`py-2 rounded-lg transition ${
+            className={`py-1.5 rounded-lg transition ${
               mobileTab === "extra"
                 ? "bg-white text-[#087443] shadow-xs"
                 : "text-[#587063]"
@@ -174,12 +201,12 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
         </div>
 
         {/* Scrollable Body Content */}
-        <div className="flex-1 overflow-y-auto pr-1 space-y-6 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto pr-1 space-y-5 scrollbar-thin min-h-0">
           {/* Desktop 2-Column Grid / Mobile Filtered View */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* COLUMN 1: CONVERT TO PDF */}
             <div
-              className={`flex flex-col gap-2.5 ${
+              className={`flex flex-col gap-2 ${
                 mobileTab !== "to_pdf" ? "hidden md:flex" : "flex"
               }`}
             >
@@ -196,7 +223,7 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
 
             {/* COLUMN 2: CONVERT FROM PDF */}
             <div
-              className={`flex flex-col gap-2.5 ${
+              className={`flex flex-col gap-2 ${
                 mobileTab !== "from_pdf" ? "hidden md:flex" : "flex"
               }`}
             >
@@ -218,21 +245,21 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
               mobileTab === "to_pdf" || mobileTab === "from_pdf" ? "hidden md:block" : "block"
             }`}
           >
-            <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center justify-between mb-2">
               <span className="font-display font-extrabold text-xs uppercase tracking-wider text-[#10241B]">
                 Alat PDF Populer Tambahan
               </span>
               <span className="text-[10px] text-[#587063]">Sering digunakan mahasiswa</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
               {EXTRA_PDF_TOOLS.map(renderToolCard)}
             </div>
           </div>
         </div>
 
         {/* Modal Footer with Attribution */}
-        <div className="pt-4 mt-3 border-t border-[#D5EADF] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#587063]">
-          <div className="flex items-center gap-1.5">
+        <div className="pt-3.5 mt-2 border-t border-[#D5EADF] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#587063] shrink-0">
+          <div className="flex items-center gap-1.5 text-center sm:text-left">
             <span>Didukung oleh</span>
             <a
               href="https://www.ilovepdf.com/id"
@@ -249,7 +276,7 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-4 py-1.5 rounded-xl bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] font-semibold text-xs transition cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2 rounded-xl bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] text-[#10241B] font-semibold text-xs transition cursor-pointer"
           >
             Tutup
           </button>
@@ -257,4 +284,6 @@ export function PdfToolsModal({ isOpen, onClose }: PdfToolsModalProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
