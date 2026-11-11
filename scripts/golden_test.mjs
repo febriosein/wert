@@ -10,6 +10,7 @@
 import { readZipCentralDirectory } from "../src/lib/storage/zip-reader.ts";
 import { validateMagicBytes } from "../src/lib/storage/validator.ts";
 import { generateRecoveryCode } from "../src/lib/utils.ts";
+import { isValidWebUrl, normalizeUrl, getLinkPlatformInfo, getDefaultLinkTitle } from "../src/lib/links.ts";
 
 let passedCount = 0;
 let failedCount = 0;
@@ -129,6 +130,35 @@ async function runGoldenTests() {
   assert(entries.length === 1, "Parses 1 entry from ZIP central directory");
   assert(entries[0].name === "tugas_akhir.docx", "Extracts exact filename: tugas_akhir.docx");
   assert(entries[0].sizeBytes === fileContent.length, "Extracts exact uncompressed size");
+
+  // 4. LINK UTILITIES & PLATFORM DETECTION
+  console.log("\n[4] Testing Link Validator & Platform Detection:");
+  assert(isValidWebUrl("https://drive.google.com/file/d/123/view") === true, "Validates HTTPS Google Drive URL");
+  assert(isValidWebUrl("http://canva.com/design/456") === true, "Validates HTTP Canva URL");
+  assert(isValidWebUrl("javascript:alert(1)") === false, "Rejects javascript: XSS pseudo-protocol");
+  assert(isValidWebUrl("data:text/html,<script>") === false, "Rejects data: URI scheme");
+  assert(isValidWebUrl("file:///etc/passwd") === false, "Rejects file: scheme");
+
+  assert(normalizeUrl("drive.google.com/test") === "https://drive.google.com/test", "Normalizes URL with missing protocol to https://");
+
+  const driveInfo = getLinkPlatformInfo("https://drive.google.com/file/d/abc/view");
+  assert(driveInfo.platform === "gdrive", "Detects Google Drive platform correctly");
+
+  const canvaInfo = getLinkPlatformInfo("https://www.canva.com/design/DAF123/view");
+  assert(canvaInfo.platform === "canva", "Detects Canva platform correctly");
+
+  const figmaInfo = getLinkPlatformInfo("https://figma.com/file/xyz");
+  assert(figmaInfo.platform === "figma", "Detects Figma platform correctly");
+
+  const docsInfo = getLinkPlatformInfo("https://docs.google.com/document/d/doc1");
+  assert(docsInfo.platform === "gdocs", "Detects Google Docs platform correctly");
+
+  const webInfo = getLinkPlatformInfo("https://github.com/febriosein/wert");
+  assert(webInfo.platform === "web", "Detects generic web URL platform correctly");
+  assert(webInfo.domain === "github.com", "Extracts clean domain name");
+
+  assert(getDefaultLinkTitle("https://drive.google.com/file/d/123") === "Tautan Google Drive", "Generates friendly default title for Google Drive");
+  assert(getDefaultLinkTitle("https://canva.com/design/123") === "Desain Canva", "Generates friendly default title for Canva");
 
   console.log("\n==================================================");
   console.log(`RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);

@@ -258,6 +258,7 @@ CRON_SECRET=ganti_dengan_string_acak_untuk_verifikasi_cron_job
 2. Jalankan isi file migrasi secara berurutan:
    - 📄 [`supabase/migrations/00001_initial_schema.sql`](supabase/migrations/00001_initial_schema.sql)
    - 📄 [`supabase/migrations/00002_fix_username_regex.sql`](supabase/migrations/00002_fix_username_regex.sql)
+   - 📄 [`supabase/migrations/00003_add_links_support.sql`](supabase/migrations/00003_add_links_support.sql)
 3. Buka menu **Storage** di Supabase Dashboard:
    - Buat bucket baru bernama `uploads`.
    - Pastikan bucket diset sebagai **Private** (bukan public).
@@ -302,6 +303,7 @@ Buka browser Anda dan kunjungi [http://localhost:3000](http://localhost:3000).
 | `DELETE` | `/api/files/[id]` | Menghapus file secara permanen dari Storage dan Database | Path Param `id` |
 | `GET` | `/api/files/[id]/archive-contents` | Menginspeksi isi file ZIP tanpa melakukan ekstraksi (*zero-extraction*) | Path Param `id` |
 | `POST` | `/api/files/[id]/replace` | Mengganti file yang sudah ada dengan versi baru secara atomik | Multi-part form data |
+| `POST` | `/api/files/link` | Menambahkan tautan web/cloud (Google Drive, Canva, Docs, Figma, dll.) | `{ "url": "https://...", "title": "Judul" }` |
 
 </details>
 
@@ -313,6 +315,7 @@ Buka browser Anda dan kunjungi [http://localhost:3000](http://localhost:3000).
 | `POST` | `/api/upload-sessions` | Menghasilkan token unik untuk QR Code sesi upload dari HP |
 | `GET` | `/api/u/[token]` | Memvalidasi token sesi upload mobile saat QR di-scan oleh smartphone |
 | `POST` | `/api/u/[token]/upload` | Menerima berkas upload dari browser smartphone mahasiswa |
+| `POST` | `/api/u/[token]/link` | Mengirim tautan tugas dari smartphone mahasiswa ke komputer fotokopi | `{ "url": "https://...", "title": "Judul" }` |
 
 </details>
 

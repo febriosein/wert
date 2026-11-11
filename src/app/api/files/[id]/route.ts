@@ -29,14 +29,18 @@ export async function DELETE(req: NextRequest, { params }: RouteProps) {
       return NextResponse.json({ error: "File tidak ditemukan atau Anda tidak memiliki akses." }, { status: 404 });
     }
 
-    // Delete from Supabase Storage
-    const storageKeysToDelete = [file.storage_key];
+    // Delete from Supabase Storage (skip external links)
+    const storageKeysToDelete = [file.storage_key].filter(
+      (k) => k && !k.startsWith("link:")
+    );
     if (file.pdf_key) storageKeysToDelete.push(file.pdf_key);
     if (file.docx_key) storageKeysToDelete.push(file.docx_key);
     if (file.preview_key) storageKeysToDelete.push(file.preview_key);
 
-    await supabaseAdmin.storage.from("uploads").remove(storageKeysToDelete).catch(() => {});
-    await supabaseAdmin.storage.from("derived").remove(storageKeysToDelete).catch(() => {});
+    if (storageKeysToDelete.length > 0) {
+      await supabaseAdmin.storage.from("uploads").remove(storageKeysToDelete).catch(() => {});
+      await supabaseAdmin.storage.from("derived").remove(storageKeysToDelete).catch(() => {});
+    }
 
     // Delete record from DB
     await supabaseAdmin.from("files").delete().eq("id", id);

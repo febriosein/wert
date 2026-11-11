@@ -8,6 +8,7 @@ import { FileCard, FileItem } from "@/components/FileCard";
 import { QrModal, getCachedQrSession, setCachedQrSession } from "@/components/QrModal";
 import { DocumentViewerModal } from "@/components/DocumentViewerModal";
 import { DeleteFileModal } from "@/components/DeleteFileModal";
+import { AddLinkModal } from "@/components/AddLinkModal";
 import {
   Plus,
   QrCode,
@@ -30,6 +31,7 @@ import {
   Clock,
   FileText,
   Check,
+  Link2,
 } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { supabaseClient } from "@/lib/supabase/client";
@@ -53,6 +55,8 @@ export default function UserDashboardPage({ params }: PageProps) {
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isAddLinkModalOpen, setIsAddLinkModalOpen] = useState(false);
+  const [pastedUrl, setPastedUrl] = useState("");
   const [showAddFile, setShowAddFile] = useState(false);
 
   // Desktop empty state QR token
@@ -62,7 +66,7 @@ export default function UserDashboardPage({ params }: PageProps) {
 
   // Fase 2: Toolbar, Search, Filter, Multi-select, and Drag states
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<"all" | "pdf" | "doc" | "image" | "urgent">("all");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "pdf" | "doc" | "image" | "link" | "urgent">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isGlobalDragging, setIsGlobalDragging] = useState(false);
@@ -190,6 +194,7 @@ export default function UserDashboardPage({ params }: PageProps) {
     pdf: files.filter((f) => (f.ext || "").toLowerCase() === "pdf").length,
     doc: files.filter((f) => ["docx", "doc"].includes((f.ext || "").toLowerCase())).length,
     image: files.filter((f) => ["png", "jpg", "jpeg", "webp", "gif"].includes((f.ext || "").toLowerCase())).length,
+    link: files.filter((f) => (f.ext || "").toLowerCase() === "link" || Boolean(f.url) || Boolean(f.storage_key?.startsWith("link:"))).length,
     urgent: files.filter((f) => {
       if (!f.expires_at) return false;
       const rem = new Date(f.expires_at).getTime() - Date.now();
@@ -211,6 +216,7 @@ export default function UserDashboardPage({ params }: PageProps) {
     if (categoryFilter === "pdf") return cleanExt === "pdf";
     if (categoryFilter === "doc") return ["docx", "doc"].includes(cleanExt);
     if (categoryFilter === "image") return ["png", "jpg", "jpeg", "webp", "gif"].includes(cleanExt);
+    if (categoryFilter === "link") return cleanExt === "link" || Boolean(file.url) || Boolean(file.storage_key?.startsWith("link:"));
     if (categoryFilter === "urgent") {
       if (!file.expires_at) return false;
       const rem = new Date(file.expires_at).getTime() - Date.now();
@@ -290,13 +296,24 @@ export default function UserDashboardPage({ params }: PageProps) {
       }
     };
 
-    // 2. Clipboard Paste ('Ctrl + V') directly uploads screenshots
+    // 2. Clipboard Paste ('Ctrl + V') directly uploads screenshots or catches links
     const handlePaste = (e: ClipboardEvent) => {
       if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
         e.preventDefault();
         const pasted = Array.from(e.clipboardData.files);
         setPendingUploadFiles(pasted);
         setShowAddFile(true);
+        return;
+      }
+
+      // Check if clipboard text is a URL
+      if (document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
+        const text = e.clipboardData?.getData("text")?.trim();
+        if (text && /^https?:\/\//i.test(text)) {
+          e.preventDefault();
+          setPastedUrl(text);
+          setIsAddLinkModalOpen(true);
+        }
       }
     };
 
@@ -376,11 +393,11 @@ export default function UserDashboardPage({ params }: PageProps) {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="hidden lg:flex px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden lg:flex px-3.5 sm:px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
@@ -388,8 +405,18 @@ export default function UserDashboardPage({ params }: PageProps) {
 
                 <button
                   type="button"
+                  onClick={() => setIsAddLinkModalOpen(true)}
+                  className="px-3.5 sm:px-4 py-2.5 rounded-[14px] bg-white border border-[#D5EADF] text-[#087443] hover:text-[#065b34] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  title="Tambah link Google Drive, Canva, Docs, dll."
+                >
+                  <Link2 className="w-4 h-4 text-[#087443]" />
+                  <span>Tambah link</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setShowAddFile(true)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-[14px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-[14px] bg-[#087443] text-white font-display font-bold text-xs sm:text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>
@@ -483,12 +510,12 @@ export default function UserDashboardPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Action Buttons: Tambah File (Sticker Style) */}
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Action Buttons: Tambah File & Link (Sticker Style) */}
+              <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="hidden lg:flex px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
+                  className="hidden lg:flex px-3.5 sm:px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#10241B] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#087443]" />
                   <span>Upload dari HP</span>
@@ -496,8 +523,18 @@ export default function UserDashboardPage({ params }: PageProps) {
 
                 <button
                   type="button"
+                  onClick={() => setIsAddLinkModalOpen(true)}
+                  className="px-3.5 sm:px-4 py-3 rounded-[16px] bg-white border border-[#D5EADF] text-[#087443] hover:text-[#065b34] font-semibold text-xs sm:text-sm hover:bg-[#E3F8EC] transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  title="Tambah link Google Drive, Canva, Docs, dll."
+                >
+                  <Link2 className="w-4 h-4 text-[#087443]" />
+                  <span>Tambah link</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setShowAddFile(!showAddFile)}
-                  className="w-full sm:w-auto px-5 py-3 rounded-[16px] bg-[#087443] text-white font-display font-bold text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 rounded-[16px] bg-[#087443] text-white font-display font-bold text-xs sm:text-sm border-2 border-[#10241B] shadow-sticker hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah file</span>
@@ -542,6 +579,7 @@ export default function UserDashboardPage({ params }: PageProps) {
                     { id: "pdf", label: "PDF", count: counts.pdf },
                     { id: "doc", label: "Word", count: counts.doc },
                     { id: "image", label: "Foto", count: counts.image },
+                    { id: "link", label: "Tautan", count: counts.link },
                     { id: "urgent", label: "Mendesak", count: counts.urgent },
                   ].map((chip) => {
                     const isActive = categoryFilter === chip.id;
@@ -865,6 +903,16 @@ export default function UserDashboardPage({ params }: PageProps) {
         isOpen={isQrModalOpen}
         onClose={() => setIsQrModalOpen(false)}
         username={username}
+      />
+
+      <AddLinkModal
+        isOpen={isAddLinkModalOpen}
+        onClose={() => {
+          setIsAddLinkModalOpen(false);
+          setPastedUrl("");
+        }}
+        onSuccess={() => loadFiles(false)}
+        initialUrl={pastedUrl}
       />
 
       <DocumentViewerModal

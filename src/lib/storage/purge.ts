@@ -48,7 +48,7 @@ export async function purgeExpiredFiles(options?: PurgeOptions): Promise<PurgeRe
 
     for (const f of expiredFiles) {
       fileIds.push(f.id);
-      if (f.storage_key) uploadKeys.push(f.storage_key);
+      if (f.storage_key && !f.storage_key.startsWith("link:")) uploadKeys.push(f.storage_key);
       if (f.pdf_key) derivedKeys.push(f.pdf_key);
       if (f.docx_key) derivedKeys.push(f.docx_key);
       if (f.preview_key) derivedKeys.push(f.preview_key);

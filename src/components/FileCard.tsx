@@ -18,7 +18,13 @@ import {
   X,
   Pin,
   Check,
+  ExternalLink,
+  Link2,
+  Copy,
+  Globe,
+  Sparkles,
 } from "lucide-react";
+import { getLinkPlatformInfo } from "@/lib/links";
 import { formatBytes, formatCountdown } from "@/lib/utils";
 import { Dropzone } from "./Dropzone";
 
@@ -32,6 +38,9 @@ export interface FileItem {
   docx_key?: string | null;
   expires_at?: string | null;
   created_at: string;
+  kind?: "document" | "image" | "archive" | "link";
+  url?: string | null;
+  storage_key?: string | null;
 }
 
 interface FileCardProps {
@@ -55,12 +64,42 @@ export function FileCard({
 }: FileCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showReplaceModal, setShowReplaceModal] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const isLink = file.ext === "link" || Boolean(file.url) || Boolean(file.storage_key?.startsWith("link:"));
+  const linkUrl = file.url || (file.storage_key?.startsWith("link:") ? file.storage_key.slice(5) : "");
+  const platformInfo = isLink ? getLinkPlatformInfo(linkUrl) : null;
+
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (linkUrl) {
+      navigator.clipboard.writeText(linkUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const handleOpenLink = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (linkUrl) {
+      window.open(linkUrl, "_blank", "noopener,noreferrer");
+    }
+  };
 
   const countdown = formatCountdown(file.expires_at);
   const cleanExt = (file.ext || "").toLowerCase();
 
   // Color tokens per file type from design.md
   const getFileTypeStyle = (ext: string) => {
+    if (isLink && platformInfo) {
+      return {
+        bg: platformInfo.badgeBg,
+        text: platformInfo.badgeText,
+        color: platformInfo.accentColor,
+        badgeBg: `${platformInfo.badgeBg} ${platformInfo.badgeText}`,
+        icon: <Link2 className="w-9 h-9" style={{ color: platformInfo.accentColor }} />,
+      };
+    }
     if (ext === "pdf") {
       return {
         bg: "bg-[#FFEAE7]",
@@ -198,7 +237,26 @@ export function FileCard({
               </div>
             )}
 
-            {isImage && !imageError ? (
+            {isLink ? (
+              /* Tactile Cloud/Web Link Card */
+              <div
+                onClick={() => handleOpenLink()}
+                className="relative w-full h-full flex items-center justify-center cursor-pointer select-none p-3 group/link"
+              >
+                <div className="w-32 h-[76px] rounded-2xl bg-white border-2 border-[#10241B] shadow-[3px_3px_0px_#10241B] p-2 flex flex-col justify-between group-hover/link:-translate-y-1 transition-all duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${platformInfo?.badgeBg} ${platformInfo?.badgeText} tracking-tight`}>
+                      {platformInfo?.label}
+                    </span>
+                    <ExternalLink className="w-3 h-3 text-[#587063] group-hover/link:text-[#087443]" />
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#10241B] truncate">
+                    <Link2 className="w-3.5 h-3.5 shrink-0 text-[#087443]" />
+                    <span className="truncate">{platformInfo?.domain || "Link Tugas"}</span>
+                  </div>
+                </div>
+              </div>
+            ) : isImage && !imageError ? (
               /* Real Image Thumbnail with Zoom and Vignette */
               <div
                 className="w-full h-full relative overflow-hidden cursor-pointer"
@@ -285,17 +343,44 @@ export function FileCard({
                     }}
                   />
                   <div className="absolute right-0 top-10 z-30 w-52 rounded-2xl bg-white border border-[#D5EADF] shadow-xl py-1.5 text-xs text-[#10241B] animate-in fade-in">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMenu(false);
-                        setShowReplaceModal(true);
-                      }}
-                      className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
-                      <span>Ganti File (Update)</span>
-                    </button>
+                    {isLink ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowMenu(false);
+                            handleOpenLink();
+                          }}
+                          className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Buka di Tab Baru</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            setShowMenu(false);
+                            handleCopyLink(e);
+                          }}
+                          className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
+                        >
+                          <Copy className="w-3.5 h-3.5 text-[#587063]" />
+                          <span>Salin URL Tautan</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMenu(false);
+                          setShowReplaceModal(true);
+                        }}
+                        className="w-full text-left px-3.5 py-2 hover:bg-[#E3F8EC] flex items-center gap-2 font-medium cursor-pointer"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Ganti File (Update)</span>
+                      </button>
+                    )}
 
                     {file.expires_at && (
                       <button
@@ -340,20 +425,20 @@ export function FileCard({
           <div className="p-5 pb-3 text-left">
             {/* File Name (max 2 lines) */}
             <h3
-              onClick={() => onPreview(file)}
+              onClick={() => (isLink ? handleOpenLink() : onPreview(file))}
               className="font-display font-bold text-base text-[#10241B] line-clamp-2 leading-snug group-hover:text-[#087443] transition-colors min-h-[44px] cursor-pointer"
               title={file.display_name}
             >
               {file.display_name}
             </h3>
 
-            {/* Meta row: Badge + Size */}
+            {/* Meta row: Badge + Size or Domain */}
             <div className="flex items-center gap-2 mt-2">
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-[8px] uppercase tracking-wider ${style.badgeBg}`}>
-                {file.ext}
+                {isLink ? (platformInfo?.label || "TAUTAN") : file.ext}
               </span>
-              <span className="text-[#587063] text-xs font-medium">
-                • {formatBytes(file.size_bytes)}
+              <span className="text-[#587063] text-xs font-medium truncate max-w-[170px]" title={isLink ? (platformInfo?.domain || linkUrl) : formatBytes(file.size_bytes)}>
+                • {isLink ? (platformInfo?.domain || "Tautan Web") : formatBytes(file.size_bytes)}
               </span>
             </div>
 
@@ -387,25 +472,51 @@ export function FileCard({
           </div>
         </div>
 
-        {/* Action Buttons: Lihat & Cetak + Unduh with Tactile Physics */}
+        {/* Action Buttons: Lihat & Cetak + Unduh (Files) OR Buka Link + Salin (Links) */}
         <div className="p-5 pt-2 flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => onPreview(file)}
-            className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow-md btn-tactile transition-all cursor-pointer"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Lihat & cetak</span>
-          </button>
+          {isLink ? (
+            <>
+              <button
+                type="button"
+                onClick={handleOpenLink}
+                className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow-md btn-tactile transition-all cursor-pointer"
+                title="Buka link di tab baru"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Buka link</span>
+              </button>
 
-          <a
-            href={`/api/files/${file.id}/download`}
-            className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] hover:border-[#19C37D] text-[#10241B] flex items-center justify-center btn-tactile transition-colors cursor-pointer"
-            title="Unduh file"
-            aria-label="Unduh file"
-          >
-            <Download className="w-4 h-4" />
-          </a>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] hover:border-[#19C37D] text-[#10241B] flex items-center justify-center btn-tactile transition-colors cursor-pointer"
+                title={copiedLink ? "Link tersalin!" : "Salin URL"}
+                aria-label="Salin URL"
+              >
+                {copiedLink ? <Check className="w-4 h-4 text-[#087443]" /> : <Copy className="w-4 h-4 text-[#587063]" />}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => onPreview(file)}
+                className="flex-1 py-2.5 px-4 rounded-[14px] bg-[#087443] hover:bg-[#065b34] text-white font-display text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow-md btn-tactile transition-all cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Lihat & cetak</span>
+              </button>
+
+              <a
+                href={`/api/files/${file.id}/download`}
+                className="w-11 h-11 shrink-0 rounded-[14px] bg-[#F4FBF7] hover:bg-[#E3F8EC] border border-[#D5EADF] hover:border-[#19C37D] text-[#10241B] flex items-center justify-center btn-tactile transition-colors cursor-pointer"
+                title="Unduh file"
+                aria-label="Unduh file"
+              >
+                <Download className="w-4 h-4" />
+              </a>
+            </>
+          )}
         </div>
       </div>
 

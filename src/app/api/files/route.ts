@@ -35,7 +35,12 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ files: files || [] });
+    const mappedFiles = (files || []).map((f) => ({
+      ...f,
+      url: f.url || (f.storage_key?.startsWith("link:") ? f.storage_key.slice(5) : undefined),
+    }));
+
+    return NextResponse.json({ files: mappedFiles });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Gagal mengambil daftar file" }, { status: 500 });
   }
