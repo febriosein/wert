@@ -56,12 +56,12 @@ export function Navbar({ username, showActions = true }: NavbarProps) {
 
         {/* Right Actions: PDF Tools + User Context */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Tombol Konversi PDF (iLovePDF) */}
+          {/* Tombol Konversi & Olah Dokumen (iLovePDF & PDF24) */}
           <button
             type="button"
             onClick={() => setShowPdfTools(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#E3F8EC] hover:bg-[#d5f3e2] text-[#087443] border border-[#19C37D]/30 transition cursor-pointer shadow-2xs"
-            title="Pusat Konversi Dokumen via iLovePDF (Word, JPG, Excel, dll.)"
+            title="Pusat Konversi & Olah Dokumen via iLovePDF & PDF24 Tools"
           >
             <RefreshCw className="w-3.5 h-3.5 text-[#087443]" />
             <span>Konversi PDF</span>

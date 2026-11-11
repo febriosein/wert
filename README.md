@@ -155,10 +155,12 @@ graph TD
 - **Pemeriksa Arsip ZIP Tanpa Ekstraksi (*Zero-Extraction*)**: Membaca *Central Directory* ZIP secara aman tanpa mengekstrak isinya ke disk, mencegah serangan *Zip Slip* atau *Zip Bomb*.
 - **Tombol Cetak Cepat 1-Klik**: Membuka dialog print browser dalam tata letak yang siap cetak.
 
-### 🔄 Pusat Konversi Dokumen (Integrasi iLovePDF)
-- **Menu Konversi di Seluruh Halaman**: Tombol *"Konversi PDF"* di Navbar membuka katalog 10+ alat konversi terpercaya iLovePDF versi Bahasa Indonesia.
-- **Convert to PDF**: Word ke PDF (mencegah tata letak rusak), JPG ke PDF, PowerPoint ke PDF, Excel ke PDF, dan HTML ke PDF.
-- **Convert from PDF**: PDF ke Word (koreksi typo mendadak), PDF ke JPG, PDF ke PowerPoint, PDF ke Excel, dan PDF ke PDF/A.
+### 🔄 Pusat Konversi & Olah Dokumen (Integrasi iLovePDF & PDF24 Tools)
+- **Menu Konversi di Seluruh Halaman**: Tombol *"Konversi PDF"* di Navbar membuka katalog lengkap 36 alat olah berkas terpercaya versi Bahasa Indonesia.
+- **Dukungan Multi-Penyedia Resmi**:
+  - **iLovePDF (12 Alat)**: Konversi cepat format Office (.docx, .pptx, .xlsx) dan gambar ke PDF, serta konversi balik PDF ke Word.
+  - **PDF24 Tools (24 Alat)**: 100% gratis tanpa batasan berkas, mencakup fitur pemisahan halaman (*Split*), penyuntingan (*Edit PDF*), penomoran halaman otomatis, tanda tangan digital, proteksi & pembukaan password, sensor informasi pribadi (*Hitamkan/Redact*), stempel tanda air (*Watermark*), hingga pengenalan teks (*OCR PDF*).
+- **Pencarian Real-Time & Filter Kategori**: Memudahkan pengguna menyaring alat berdasarkan kebutuhan (*Ke PDF*, *Dari PDF*, *Atur & Pisah*, *Edit & Keamanan*).
 - **Pintasan Kontekstual File**: Kartu dokumen Word/Excel/PPT/Gambar langsung menyediakan shortcut konversi ke PDF di menu opsi `⋮` tanpa perlu mencari alat secara manual.
 
 ### 🔒 Proteksi Khusus Komputer Rental

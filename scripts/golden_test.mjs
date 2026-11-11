@@ -11,7 +11,13 @@ import { readZipCentralDirectory } from "../src/lib/storage/zip-reader.ts";
 import { validateMagicBytes } from "../src/lib/storage/validator.ts";
 import { generateRecoveryCode } from "../src/lib/utils.ts";
 import { isValidWebUrl, normalizeUrl, getLinkPlatformInfo, getDefaultLinkTitle } from "../src/lib/links.ts";
-import { CONVERT_TO_PDF_TOOLS, CONVERT_FROM_PDF_TOOLS, EXTRA_PDF_TOOLS } from "../src/lib/pdf-tools.ts";
+import {
+  CONVERT_TO_PDF_TOOLS,
+  CONVERT_FROM_PDF_TOOLS,
+  EXTRA_PDF_TOOLS,
+  PDF24_TOOLS,
+  ALL_PDF_TOOLS,
+} from "../src/lib/pdf-tools.ts";
 
 let passedCount = 0;
 let failedCount = 0;
@@ -176,6 +182,23 @@ async function runGoldenTests() {
 
   const pdfToWord = CONVERT_FROM_PDF_TOOLS.find((t) => t.id === "pdf-to-word");
   assert(pdfToWord && pdfToWord.formatFrom === "PDF" && pdfToWord.formatTo === "DOCX", "PDF to Word tool properly configured");
+
+  // 6. PDF24 TOOLS CATALOG INTEGRITY
+  console.log("\n[6] Testing PDF24 Tools Catalog:");
+  assert(PDF24_TOOLS.length === 24, "Catalog has 24 PDF24 tools");
+  assert(ALL_PDF_TOOLS.length === 36, "Combined catalog has 36 tools across iLovePDF and PDF24");
+
+  const allPdf24UrlsValid = PDF24_TOOLS.every((t) => t.url.startsWith("https://tools.pdf24.org/id/"));
+  assert(allPdf24UrlsValid, "All PDF24 tools link to secure Indonesian endpoints (https://tools.pdf24.org/id/...)");
+
+  const pdf24Merge = PDF24_TOOLS.find((t) => t.id === "pdf24-gabung-pdf");
+  assert(pdf24Merge && pdf24Merge.url === "https://tools.pdf24.org/id/gabung-pdf", "PDF24 Gabungkan PDF properly configured");
+
+  const pdf24Split = PDF24_TOOLS.find((t) => t.id === "pdf24-pisahkan-pdf");
+  assert(pdf24Split && pdf24Split.url === "https://tools.pdf24.org/id/pisahkan-pdf", "PDF24 Pisahkan PDF properly configured");
+
+  const pdf24Ocr = PDF24_TOOLS.find((t) => t.id === "pdf24-ocr-pdf");
+  assert(pdf24Ocr && pdf24Ocr.formatFrom === "SCAN" && pdf24Ocr.provider === "pdf24", "PDF24 OCR properly configured");
 
   console.log("\n==================================================");
   console.log(`RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);
